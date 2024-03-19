@@ -19,6 +19,7 @@ public class StudyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int study_id;
 
+    // need to modify reference
     @Column(nullable = false)
     private String creator_id;
 
