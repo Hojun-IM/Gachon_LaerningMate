@@ -16,12 +16,13 @@ import java.util.Date;
 public class Study {
 
     @Id
+    // 기본 키 값을 DB에 자동 생성
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int studyId;
 
     // 한 명의 User가 여러 Study를 생성할 수 있음
     @ManyToOne
-    @JoinColumn(name = "creatorId", referencedColumnName = "userId")
+    @JoinColumn(name = "creator_id", referencedColumnName = "user_id")
     private User creatorId;
 
     @Column(nullable = false, length = 100)
@@ -49,13 +50,13 @@ public class Study {
     // 생성시 자동으로 날짜 시간 저장
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
     // 업데이트시 자동으로 날짜 시간 저장
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
 }
