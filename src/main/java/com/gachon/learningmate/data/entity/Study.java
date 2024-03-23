@@ -5,26 +5,27 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
+@Builder
 @Table(name = "study")
-public class StudyEntity {
+public class Study {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int study_id;
+    private int studyId;
 
-    // need to modify reference
-    @Column(nullable = false)
-    private String creator_id;
+    // 한 명의 User가 여러 Study를 생성할 수 있음
+    @ManyToOne
+    @JoinColumn(name = "creatorId", referencedColumnName = "userId")
+    private User creatorId;
 
     @Column(nullable = false, length = 100)
-    private String study_name;
+    private String studyName;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
@@ -40,17 +41,21 @@ public class StudyEntity {
     private String location;
 
     @Column(nullable = false)
-    private int max_member;
+    private int maxMember;
 
     @Column(nullable = false)
-    private int current_member = 1;
+    private int currentMember = 1;
 
+    // 생성시 자동으로 날짜 시간 저장
     @CreationTimestamp
-    @Column(nullable = false)
-    private Timestamp created_at;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
+    private Date createdAt;
 
+    // 업데이트시 자동으로 날짜 시간 저장
     @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Timestamp updated_at;
+    private Date updatedAt;
 
 }
