@@ -19,11 +19,11 @@ public class UserRating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rateId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "rater_id")
     private User rater;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "rated_id")
     private User rated;
 
