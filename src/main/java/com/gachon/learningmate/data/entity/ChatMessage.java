@@ -23,4 +23,7 @@ public class ChatMessage {
     @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "user_id" )
     private User sender;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String message;
 }
