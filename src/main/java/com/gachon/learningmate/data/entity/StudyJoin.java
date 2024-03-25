@@ -20,11 +20,11 @@ public class StudyJoin {
     private Long joinId;
 
     @ManyToOne
-    @JoinColumn(name = "study_id", referencedColumnName = "study_id")
+    @JoinColumn(name = "study_id")
     private Study study;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @CreationTimestamp

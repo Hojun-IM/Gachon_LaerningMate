@@ -30,7 +30,7 @@ public class Photo {
     @Column(nullable = false)
     private Long size;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "study_id")
     private Study study;
 

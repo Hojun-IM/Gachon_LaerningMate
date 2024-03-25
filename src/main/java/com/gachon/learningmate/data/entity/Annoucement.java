@@ -19,11 +19,11 @@ public class Annoucement {
     private Long announcementId;
 
     @ManyToOne
-    @JoinColumn(name = "study_id", referencedColumnName = "study_id")
+    @JoinColumn(name = "study_id")
     private Study study;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(nullable = false, length = 100)

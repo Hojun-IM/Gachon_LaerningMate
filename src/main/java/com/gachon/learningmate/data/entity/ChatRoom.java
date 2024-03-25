@@ -17,6 +17,6 @@ public class ChatRoom {
     private Long chatId;
 
     @ManyToOne
-    @JoinColumn(name = "study_id", referencedColumnName = "study_id")
+    @JoinColumn(name = "study_id")
     private Study study;
 }

@@ -20,11 +20,11 @@ public class Favorite {
     private Long favoriteId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "study_id", referencedColumnName = "study_id")
+    @JoinColumn(name = "study_id")
     private Study study;
 
     @CreationTimestamp

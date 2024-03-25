@@ -22,7 +22,7 @@ public class Study {
 
     // 한 명의 User가 여러 Study를 생성할 수 있음
     @ManyToOne
-    @JoinColumn(name = "creator_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     private User creatorId;
 
     @Column(nullable = false, length = 100)
