@@ -2,8 +2,10 @@ package com.gachon.learningmate.controller;
 
 import com.gachon.learningmate.data.dto.RegisterDto;
 import com.gachon.learningmate.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,10 +33,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String doRegister(@ModelAttribute RegisterDto registerDto, BindingResult result, RedirectAttributes redirectAttributes) {
+    public String doRegister(@ModelAttribute @Valid RegisterDto registerDto, BindingResult result, RedirectAttributes redirectAttributes, Model model) {
         // 유효성 검사 실패 시, 회원가입 화면으로 redirect
         if (result.hasErrors()) {
-            return "/register";
+            model.addAttribute("errors", result.getAllErrors());
+            model.addAttribute("registerDto", registerDto);
+            return "redirect:/register";
         }
 
         // 회원가입 로직
