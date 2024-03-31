@@ -32,7 +32,8 @@ public class RegisterDto {
 
     @NotBlank(message = "생년월일은 필수 항목입니다.")
     @DateTimeFormat(pattern = "yyyy/MM/dd")
-    private Date birth;
+    private String birth;
 
-    private UserType type;
+    @Builder.Default
+    private UserType type = UserType.Member;
 }
