@@ -27,15 +27,9 @@
                                     {{#error_username}} <span id="error">{{error_username}}</span> {{/error_username}}
                                 </div>
 
-                                <div class="form-outline form-white mb-4 d-flex align-items-center">
-                                    <input type="text" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" placeholder="EMAIL" class="form-control form-control-lg flex-grow-1 me-2" />
+                                <div class="form-outline form-white mb-4">
+                                    <input type="text" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" placeholder="EMAIL" class="form-control form-control-lg" />
                                     {{#error_email}} <span id="error">{{error_email}}</span> {{/error_email}}
-                                    <input type="button" onclick="sendVerificationCode()" value="인증번호 전송" class="btn btn-outline-light btn-sm" />
-                                </div>
-
-                                <div class="form-outline form-white mb-4 d-flex align-items-center">
-                                    <input type="text" name="verificationCode" placeholder="Verification Code" class="form-control form-control-lg flex-grow-1 me-2" />
-                                    <input type="button" onclick="sendVerificationCode()" value="인증번호 확인" class="btn btn-outline-light btn-sm" />
                                 </div>
 
                                 <div class="form-outline form-white mb-4">
