@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: LearningMate
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/learningmate
+  jpa:
+    show-sql: 'true'
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: 'true'
+  mail:
+    host: stmp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    auth-code-expiration-millis: 300000
+  redis:
+    mail:
+      host: localhost
+      port: 6379
+
+server:
+  servlet:
+    encoding:
+      force-response: 'true'
+
+serverTimezone: UTC&characterEncoding=UTF-8
