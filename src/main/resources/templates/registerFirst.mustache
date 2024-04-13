@@ -1,0 +1,45 @@
+{{>layouts/header}}
+
+<section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                    <div class="card-body p-5 text-center">
+
+                        <div class="mb-md-5 mt-md-4 pb-5">
+                            <h2 class="fw-bold mb-2 text-uppercase">회원가입</h2>
+                            <p class="text-white-50 mb-5">이메일 정보를 입력해주세요!</p>
+
+                            <!-- 인증 코드 전송 -->
+                            <form action="/register/send-verification" method="post" modelAttribute="registerDto">
+
+                                <div class="form-outline form-white mb-4 d-flex align-items-center">
+                                    <input type="text" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" placeholder="EMAIL" class="form-control form-control-lg flex-grow-1 me-2" />
+                                    <button type="button" type="submit" class="btn btn-outline-light btn-sm" />인증 코드 전송</button>
+                                    {{#error_email}} <span id="error">{{error_email}}</span> {{/error_email}}
+                                </div>
+                            </form>
+
+                            <!-- 인증 코드 검증 -->
+                            <form action="/register/verify-code" method="post" modelAttribute="registerDto">
+                                <div class="form-outline form-white mb-4 d-flex align-items-center">
+                                    <input type="text" name="verificationCode" placeholder="Verification Code" class="form-control form-control-lg flex-grow-1 me-2" />
+                                    <button type="button" type="submit" class="btn btn-outline-light btn-sm" />인증 코드 확인</button>
+                                    {{#error_verificationCode}} <span id="error">{{error_verificationCode}}</span> {{/error_verificationCode}}
+                                </div>
+                            </form>
+
+                        </div>
+                        <!-- 회원 가입 다음 단계로 넘어가기-->
+                        <form action="/registerSecond" method="post" modelAttribute="registerDto">
+                            <button type="button" type="submit" class="btn btn-outline-light btn-lg px-5" />회원가입 계속하기</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{>layouts/footer}}
