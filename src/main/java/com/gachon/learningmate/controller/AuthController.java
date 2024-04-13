@@ -18,12 +18,10 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-    private final MailService mailService;
 
     @Autowired
-    public AuthController(AuthService authService, MailService mailService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.mailService = mailService;
     }
 
     // 로그인 화면 출력
