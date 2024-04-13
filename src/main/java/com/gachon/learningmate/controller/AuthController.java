@@ -38,24 +38,6 @@ public class AuthController {
     @GetMapping("/registerSecond")
     public String showRegisterFromSecond() { return "registerSecond"; }
 
-    // 회원가입 이메일 정보 전송
-    @PostMapping("/registerFirst")
-    public String doRegisterFirst(@Valid RegisterDto registerDto, Errors errors, Model model) {
-
-        if (errors.hasErrors()) {
-            model.addAttribute("registerDto", registerDto);
-            // 유효성 검사를 통과 못한 필드와 메시지 핸들링
-            Map<String, String> validatorResult = authService.validateHandling(errors);
-            for (String key : validatorResult.keySet()) {
-                model.addAttribute(key, validatorResult.get(key));
-            }
-            return "registerFirst";
-        }
-
-        // 회원가입 성공 후, 로그인 화면으로 redirect
-        return "redirect:/registerSecond";
-    }
-
     // 이메일 인증 코드 전송
     @PostMapping("/register/send-verification")
     public String sendVerificationEmail(@RequestParam String email, Model model, RegisterDto registerDto) {
@@ -63,11 +45,11 @@ public class AuthController {
 
         try {
             authService.sendVerificationCode(email);
-            model.addAttribute("message", "인증 코드가 이메일로 전송되었습니다.");
+            model.addAttribute("message_email", "인증 코드가 이메일로 전송되었습니다.");
         } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("error_email", e.getMessage());
         }
-        return "registerSecond";
+        return "registerFirst";
     }
 
     // 이메일 인증 코드 검증
@@ -77,12 +59,11 @@ public class AuthController {
 
         try {
             authService.verifyCode(email, verificationCode);
-            model.addAttribute("emailVerified", true);
             return "redirect:/registerSecond";
         } catch (RuntimeException e) {
-            model.addAttribute("error", "인증 코드가 잘못되었습니다: " + e.getMessage());
+            model.addAttribute("error_verificationCode", e.getMessage());
+            return "registerFirst";
         }
-        return "registerSecond";
     }
 
     // 회원가입 이메일 제외 나머지 입력 정보 전송
