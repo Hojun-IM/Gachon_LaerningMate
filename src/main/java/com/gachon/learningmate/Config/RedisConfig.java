@@ -1,5 +1,6 @@
 package com.gachon.learningmate.Config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,16 +14,16 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableRedisRepositories
 public class RedisConfig {
 
-    private final RedisProperties properties;
+    @Value("${spring.redis.host}")
+    private String host;
 
-    public RedisConfig(RedisProperties properties) {
-        this.properties = properties;
-    }
+    @Value("${spring.redis.port}")
+    private int port;
 
     // yml 설정 파일에 저장한 정보와 연결
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(properties.getHost(), properties.getPort());
+        return new LettuceConnectionFactory(host, port);
     }
 
     @Bean
