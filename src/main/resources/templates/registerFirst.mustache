@@ -16,25 +16,23 @@
 
                                 <div class="form-outline form-white mb-4 d-flex align-items-center">
                                     <input type="text" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" placeholder="EMAIL" class="form-control form-control-lg flex-grow-1 me-2" />
-                                    <button type="button" type="submit" class="btn btn-outline-light btn-sm" />인증 코드 전송</button>
-                                    {{#error_email}} <span id="error">{{error_email}}</span> {{/error_email}}
+                                    <button type="submit" class="btn btn-outline-light btn-sm" />인증 코드 전송</button>
                                 </div>
+                                {{#error_email}}<span class="alert alert-danger">{{error_email}}</span>{{/error_email}}
+                                {{#message_email}}<span class="alert alert-success">{{message_email}}</span>{{/message_email}}
                             </form>
 
                             <!-- 인증 코드 검증 -->
                             <form action="/register/verify-code" method="post" modelAttribute="registerDto">
+                                <input type="hidden" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" />
                                 <div class="form-outline form-white mb-4 d-flex align-items-center">
-                                    <input type="text" name="verificationCode" placeholder="Verification Code" class="form-control form-control-lg flex-grow-1 me-2" />
-                                    <button type="button" type="submit" class="btn btn-outline-light btn-sm" />인증 코드 확인</button>
-                                    {{#error_verificationCode}} <span id="error">{{error_verificationCode}}</span> {{/error_verificationCode}}
+                                    <input type="text" name="verificationCode" value="{{#registerDto}}{{registerDto.verificationCode}}{{/registerDto}}" placeholder="Verification Code" class="form-control form-control-lg flex-grow-1 me-2" />
+                                    <button type="submit" class="btn btn-outline-light btn-sm" />인증 코드 확인</button>
                                 </div>
+                                {{#error_verificationCode}}<span class="alert alert-danger">{{error_verificationCode}}</span>{{/error_verificationCode}}
                             </form>
 
                         </div>
-                        <!-- 회원 가입 다음 단계로 넘어가기-->
-                        <form action="/registerSecond" method="post" modelAttribute="registerDto">
-                            <button type="button" type="submit" class="btn btn-outline-light btn-lg px-5" />회원가입 계속하기</button>
-                        </form>
                     </div>
                 </div>
             </div>
