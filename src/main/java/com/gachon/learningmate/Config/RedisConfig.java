@@ -1,6 +1,5 @@
 package com.gachon.learningmate.Config;
 
-import com.gachon.learningmate.data.repository.RedisRepositories;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
