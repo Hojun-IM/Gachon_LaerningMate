@@ -14,33 +14,22 @@
                             <form action="/register" method="post" modelAttribute="registerDto">
                                 <div class="form-outline form-white mb-4">
                                     <input type="text" name="userId" value="{{#registerDto}}{{registerDto.userId}}{{/registerDto}}" placeholder="ID" class="form-control form-control-lg" />
-                                    {{#error_userId}} <span id="error">{{error_userId}}</span> {{/error_userId}}
+                                    {{#error_userId}} <span class="alert alert-danger">{{error_userId}}</span> {{/error_userId}}
                                 </div>
 
                                 <div class="form-outline form-white mb-4">
                                     <input type="password" name="password" value="{{#registerDto}}{{registerDto.password}}{{/registerDto}}" placeholder="PASSWORD" class="form-control form-control-lg" />
-                                    {{#error_password}} <span id="error">{{error_password}}</span> {{/error_password}}
+                                    {{#error_password}} <span class="alert alert-danger">{{error_password}}</span> {{/error_password}}
                                 </div>
 
                                 <div class="form-outline form-white mb-4">
                                     <input type="text" name="username" value="{{#registerDto}}{{registerDto.username}}{{/registerDto}}" placeholder="NAME" class="form-control form-control-lg" />
-                                    {{#error_username}} <span id="error">{{error_username}}</span> {{/error_username}}
-                                </div>
-
-                                <div class="form-outline form-white mb-4 d-flex align-items-center">
-                                    <input type="text" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" placeholder="EMAIL" class="form-control form-control-lg flex-grow-1 me-2" />
-                                    {{#error_email}} <span id="error">{{error_email}}</span> {{/error_email}}
-                                    <input type="button" onclick="sendVerificationCode()" value="인증번호 전송" class="btn btn-outline-light btn-sm" />
-                                </div>
-
-                                <div class="form-outline form-white mb-4 d-flex align-items-center">
-                                    <input type="text" name="verificationCode" placeholder="Verification Code" class="form-control form-control-lg flex-grow-1 me-2" />
-                                    <input type="button" onclick="sendVerificationCode()" value="인증번호 확인" class="btn btn-outline-light btn-sm" />
+                                    {{#error_username}} <span class="alert alert-danger">{{error_username}}</span> {{/error_username}}
                                 </div>
 
                                 <div class="form-outline form-white mb-4">
                                     <input type="text" name="birth" value="{{#registerDto}}{{registerDto.birth}}{{/registerDto}}" placeholder="BIRTH ex)yyyy/mm/dd" class="form-control form-control-lg" />
-                                    {{#error_birth}} <span id="error">{{error_birth}}</span> {{/error_birth}}
+                                    {{#error_birth}} <span class="alert alert-danger">{{error_birth}}</span> {{/error_birth}}
                                 </div>
 
                                 <button class="btn btn-outline-light btn-lg px-5" type="submit">회원가입</button>
