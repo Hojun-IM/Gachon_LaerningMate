@@ -37,16 +37,4 @@ public class RegisterDto {
 
     @Builder.Default
     private UserType type = UserType.Member;
-
-    @Override
-    public String toString() {
-        return "RegisterDto{" +
-                "userId='" + userId + '\'' +
-                ", password='" + password + '\'' +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", birth='" + birth + '\'' +
-                ", type=" + type +
-                '}';
-    }
 }
