@@ -2,19 +2,18 @@ package com.gachon.learningmate.controller;
 
 import com.gachon.learningmate.data.dto.RegisterDto;
 import com.gachon.learningmate.service.AuthService;
-import com.gachon.learningmate.service.MailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 
 import java.util.Map;
 
 @Controller
+@SessionAttributes("registerDto")
 public class AuthController {
 
     private final AuthService authService;
@@ -24,28 +23,46 @@ public class AuthController {
         this.authService = authService;
     }
 
+    // 모든 요청에 대해 모델에 registerDto가 없으면 새로 추가
+    @ModelAttribute("registerDto")
+    public RegisterDto registerDto() {
+        // registerDto가 전달될 때 값이 없어 발생하는 문제를 해결하기 위해 초기화
+        RegisterDto registerDto = new RegisterDto();
+        registerDto.setUserId("");
+        registerDto.setPassword("");
+        registerDto.setUsername("");
+        registerDto.setEmail("");
+        registerDto.setBirth("");
+        return registerDto;
+    }
+
     // 로그인 화면 출력
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";
     }
 
-    // 회원가입 화면 출력 (이메일 인증)
+    // 회원가입 화면 출력 (이메일 인증 단계)
     @GetMapping("/registerFirst")
-    public String showRegisterFromFirst() { return "registerFirst"; }
+    public String showRegisterFromFirst(Model model) {
+        return "registerFirst";
+    }
 
-    /// 회원가입 화면 출력 (나머지 정보)
+    // 회원가입 화면 출력 (나머지 정보 입력 단계)
     @GetMapping("/registerSecond")
-    public String showRegisterFromSecond() { return "registerSecond"; }
+    public String showRegisterFromSecond() {
+        return "registerSecond";
+    }
 
     // 이메일 인증 코드 전송
     @PostMapping("/register/send-verification")
-    public String sendVerificationEmail(@RequestParam String email, Model model, RegisterDto registerDto) {
-        model.addAttribute("registerDto", registerDto);
+    public String sendVerificationEmail(@RequestParam String email, Model model, @ModelAttribute("registerDto") RegisterDto registerDto) {
 
         try {
             authService.sendVerificationCode(email);
             model.addAttribute("message_email", "인증 코드가 이메일로 전송되었습니다.");
+            registerDto.setEmail(email);
+            model.addAttribute("registerDto", registerDto);
         } catch (RuntimeException e) {
             model.addAttribute("error_email", e.getMessage());
         }
@@ -54,11 +71,11 @@ public class AuthController {
 
     // 이메일 인증 코드 검증
     @PostMapping("/register/verify-code")
-    public String verifyEmailCode(@RequestParam String email, @RequestParam String verificationCode, Model model, RegisterDto registerDto) {
-        model.addAttribute("registerDto", registerDto);
+    public String verifyEmailCode(@RequestParam String verificationCode, Model model, @ModelAttribute("registerDto") RegisterDto registerDto) {
 
         try {
-            authService.verifyCode(email, verificationCode);
+            authService.verifyCode(registerDto.getEmail(), verificationCode);
+            model.addAttribute("registerDto", registerDto);
             return "redirect:/registerSecond";
         } catch (RuntimeException e) {
             model.addAttribute("error_verificationCode", e.getMessage());
@@ -68,7 +85,7 @@ public class AuthController {
 
     // 회원가입 이메일 제외 나머지 입력 정보 전송
     @PostMapping("/registerSecond")
-    public String doRegisterSecond(@Valid RegisterDto registerDto, Errors errors, Model model) {
+    public String doRegisterSecond(@ModelAttribute("registerDto") @Valid RegisterDto registerDto, Errors errors, Model model, SessionStatus status) {
 
         if (errors.hasErrors()) {
             model.addAttribute("registerDto", registerDto);
@@ -82,6 +99,9 @@ public class AuthController {
 
         // 회원가입 로직
         authService.register(registerDto);
+        
+        // session에서 registerDto 제거
+        status.setComplete();
 
         // 회원가입 성공 후, 로그인 화면으로 redirect
         return "redirect:/login";
