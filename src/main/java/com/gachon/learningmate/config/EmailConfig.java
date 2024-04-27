@@ -1,4 +1,4 @@
-package com.gachon.learningmate.Config;
+package com.gachon.learningmate.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
