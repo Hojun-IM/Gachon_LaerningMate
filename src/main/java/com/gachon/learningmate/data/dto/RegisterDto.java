@@ -2,12 +2,8 @@ package com.gachon.learningmate.data.dto;
 
 import com.gachon.learningmate.data.entity.UserType;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
 
 @Getter
 @Setter
