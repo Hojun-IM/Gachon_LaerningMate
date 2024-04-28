@@ -1,7 +1,9 @@
 package com.gachon.learningmate.controller;
 
+import com.gachon.learningmate.data.dto.LoginDto;
 import com.gachon.learningmate.data.dto.RegisterDto;
 import com.gachon.learningmate.service.AuthService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -105,5 +107,30 @@ public class AuthController {
 
         // 회원가입 성공 후, 로그인 화면으로 redirect
         return "redirect:/login";
+    }
+
+    // 로그인 전송
+    @PostMapping("/login")
+    public String doLogin(@Valid LoginDto loginDto, Errors errors, Model model, HttpSession session) {
+
+        if (errors.hasErrors()) {
+            model.addAttribute("loginDto", loginDto);
+            // 유효성 검사를 통과 못한 필드와 메시지 핸들링
+            Map<String, String> validatorResult = authService.validateHandling(errors);
+            for (String key : validatorResult.keySet()) {
+                model.addAttribute(key, validatorResult.get(key));
+            }
+            return "login";
+        }
+
+        if (authService.login(loginDto.getUserId(), loginDto.getPassword())) {
+            session.setAttribute("loggedInUser", loginDto.getUserId());
+            return "redirect:/home";
+        } else {
+            model.addAttribute("loginError", "사용자 ID 또는 비밀번호가 틀렸습니다.");
+            return "login";
+        }
+
+
     }
 }
