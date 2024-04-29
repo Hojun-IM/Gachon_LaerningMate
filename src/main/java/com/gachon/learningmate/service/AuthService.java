@@ -5,6 +5,7 @@ import com.gachon.learningmate.data.dto.RegisterDto;
 import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -23,12 +24,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final MailService mailService;
     private final RedisService redisService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthService(UserRepository userRepository, MailService mailService, RedisService redisService) {
+    public AuthService(UserRepository userRepository, MailService mailService, RedisService redisService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.redisService = redisService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // 이메일 유효성 확인
@@ -120,10 +123,11 @@ public class AuthService {
 
     // 회원가입을 위한 User 객체 생성
     private User createUserFromDto(RegisterDto registerDto) {
+        String encryptedPassword = passwordEncoder.encode(registerDto.getPassword());
         Date birthDate = parseDate(registerDto);
         return User.builder()
                 .userId(registerDto.getUserId())
-                .password(registerDto.getPassword())
+                .password(encryptedPassword)
                 .username(registerDto.getUsername())
                 .email(registerDto.getEmail())
                 .birth(birthDate)
@@ -133,7 +137,6 @@ public class AuthService {
 
     // 회원가입
     public void register(RegisterDto registerDto) {
-        //비밀번호 암호화
 
         // registerDto의 사용자 정보를 엔티티 객체로 변환
         User user = createUserFromDto(registerDto);
