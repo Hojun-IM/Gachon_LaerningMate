@@ -88,7 +88,6 @@ public class AuthController {
     // 회원가입 이메일 제외 나머지 입력 정보 전송
     @PostMapping("/registerSecond")
     public String doRegisterSecond(@ModelAttribute("registerDto") @Valid RegisterDto registerDto, Errors errors, Model model, SessionStatus status) {
-
         if (errors.hasErrors()) {
             model.addAttribute("registerDto", registerDto);
             // 유효성 검사를 통과 못한 필드와 메시지 핸들링
@@ -110,27 +109,5 @@ public class AuthController {
     }
 
     // 로그인 전송
-    @PostMapping("/login")
-    public String doLogin(@Valid LoginDto loginDto, Errors errors, Model model, HttpSession session) {
 
-        if (errors.hasErrors()) {
-            model.addAttribute("loginDto", loginDto);
-            // 유효성 검사를 통과 못한 필드와 메시지 핸들링
-            Map<String, String> validatorResult = authService.validateHandling(errors);
-            for (String key : validatorResult.keySet()) {
-                model.addAttribute(key, validatorResult.get(key));
-            }
-            return "login";
-        }
-
-        if (authService.login(loginDto.getUserId(), loginDto.getPassword())) {
-            session.setAttribute("loggedInUser", loginDto.getUserId());
-            return "redirect:/home";
-        } else {
-            model.addAttribute("loginError", "사용자 ID 또는 비밀번호가 틀렸습니다.");
-            return "login";
-        }
-
-
-    }
 }
