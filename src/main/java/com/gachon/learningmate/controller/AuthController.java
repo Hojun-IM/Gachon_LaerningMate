@@ -46,13 +46,13 @@ public class AuthController {
 
     // 회원가입 화면 출력 (이메일 인증 단계)
     @GetMapping("/registerFirst")
-    public String showRegisterFromFirst(Model model) {
+    public String showRegisterFormFirst(Model model) {
         return "registerFirst";
     }
 
     // 회원가입 화면 출력 (나머지 정보 입력 단계)
     @GetMapping("/registerSecond")
-    public String showRegisterFromSecond() {
+    public String showRegisterFormSecond() {
         return "registerSecond";
     }
 
@@ -73,14 +73,16 @@ public class AuthController {
 
     // 이메일 인증 코드 검증
     @PostMapping("/register/verify-code")
-    public String verifyEmailCode(@RequestParam String verificationCode, Model model, @ModelAttribute("registerDto") RegisterDto registerDto) {
+    public String verifyEmailCode(@RequestParam String verificationCode, Model model, @ModelAttribute("registerDto") RegisterDto registerDto, HttpSession session) {
 
         try {
             authService.verifyCode(registerDto.getEmail(), verificationCode);
             model.addAttribute("registerDto", registerDto);
+            session.setAttribute("emailVerified", true);
             return "redirect:/registerSecond";
         } catch (RuntimeException e) {
             model.addAttribute("error_verificationCode", e.getMessage());
+            session.setAttribute("emailVerified", false);
             return "registerFirst";
         }
     }
