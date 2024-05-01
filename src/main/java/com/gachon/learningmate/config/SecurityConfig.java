@@ -17,8 +17,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authrizeRequest) ->
                         authrizeRequest
-                                .requestMatchers("/", "/home", "/login", "/registerFirst", "/register/send-verification", "/register/verify-code").permitAll()  // 로그인 없이 접근 허용
-                                .requestMatchers("/registerSecond").authenticated()              // 인증된 사용자만 접근 허용
+                                .requestMatchers("/", "/home", "/login", "/registerFirst", "/register/send-verification", "/register/verify-code", "/registerSecond").permitAll()  // 로그인 없이 접근 허용// 인증된 사용자만 접근 허용
                                 .requestMatchers("/css/**", "/js/**", "/img/**").permitAll() // 정적 파일 접근 허용
                                 .anyRequest().authenticated()                                      // 그 외 모든 요청은 인증 필요
                 )
