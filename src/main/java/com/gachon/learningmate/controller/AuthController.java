@@ -46,14 +46,20 @@ public class AuthController {
 
     // 회원가입 화면 출력 (이메일 인증 단계)
     @GetMapping("/registerFirst")
-    public String showRegisterFormFirst(Model model) {
+    public String showRegisterFormFirst() {
         return "registerFirst";
     }
 
     // 회원가입 화면 출력 (나머지 정보 입력 단계)
     @GetMapping("/registerSecond")
-    public String showRegisterFormSecond() {
-        return "registerSecond";
+    public String showRegisterFormSecond(HttpSession session) {
+        // 세션에서 emailVerified 속성 확인
+        Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
+        if (Boolean.TRUE.equals(emailVerified)) {
+            return "registerSecond";
+        } else {
+            return "redirect:/login";
+        }
     }
 
     // 이메일 인증 코드 전송
@@ -90,6 +96,7 @@ public class AuthController {
     // 회원가입 이메일 제외 나머지 입력 정보 전송
     @PostMapping("/registerSecond")
     public String doRegisterSecond(@ModelAttribute("registerDto") @Valid RegisterDto registerDto, Errors errors, Model model, SessionStatus status) {
+
         if (errors.hasErrors()) {
             model.addAttribute("registerDto", registerDto);
             // 유효성 검사를 통과 못한 필드와 메시지 핸들링
