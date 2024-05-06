@@ -26,7 +26,8 @@
                                 <input type="text" name="verificationCode" value="{{#registerDto}}{{registerDto.verificationCode}}{{/registerDto}}" placeholder="Verification Code" class="form-control form-control-lg flex-grow-1 me-2" />
                                 <button type="submit" class="btn btn-outline-light btn-sm" />인증 코드 확인</button>
                             </div>
-                            <div class="text-danger mb-2" style="min-height: 15px;">{{#error_verificationCode}}{{error_verificationCode}}{{/error_verificationCode}}</div>
+                            <div class="text-danger mb-2" style="min-height: 10px;">{{#error_verificationCode}}{{error_verificationCode}}{{/error_verificationCode}}</div>
+                            <div class="text-success mb-2" style="min-height: 8px;">{{#message_verification}}{{message_verification}}{{/message_verification}}</div>
                         </form>
 
                         <hr class="my-3">
@@ -57,7 +58,7 @@
 
                             <button class="btn btn-outline-light btn-lg px-5" type="submit">회원가입</button>
                             <!-- 이메일 인증 오류 메시지 -->
-                            {{#error_verification}}<div class="alert-message">{{error_verification}}</div>{{/error_verification}}
+                            <div class="alert-message">{{#error_verification}}{{error_verification}}{{/error_verification}}</div>
                         </form>
 
                     </div>
