@@ -60,7 +60,6 @@ public class RegisterController {
         if (errors.hasErrors() || Boolean.FALSE.equals(emailVerified)) {
             model.addAttribute("registerDto", registerDto);
 
-            // 유효성 검사를 통과하지 못한 필드의 오류 메시지를 추가
             Map<String, String> validatorResult = registerService.validateHandling(errors);
             for (String key : validatorResult.keySet()) {
                 model.addAttribute(key, validatorResult.get(key));
@@ -68,10 +67,17 @@ public class RegisterController {
             return "register";
         }
 
-        // 모든 검증을 통과한 경우 회원가입 로직 수행
-        registerService.register(registerDto);
-        status.setComplete();
-        return "redirect:/login";
+        try {
+            // 모든 검증을 통과한 경우 회원가입 로직 수행
+            registerService.register(registerDto);
+            status.setComplete();
+            session.removeAttribute("emailVerified");
+            return "/login";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("registerDto", registerDto);
+            model.addAttribute("error_userId", e.getMessage());
+            return "register";
+        }
     }
 
     // 회원가입 인증 코드 전송
