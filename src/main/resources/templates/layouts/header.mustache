@@ -25,7 +25,16 @@
             <div class="navbar-nav">
                 <a class="nav-link" aria-current="page" href="#">Home</a>
                 <a class="nav-link" href="#">About</a>
-                <a class="nav-link active" href="#">Login</a>
+                <!-- 로그인 상태에 따라 로그인/로그아웃 및 사용자 이름 표시 -->
+                {{#username}}
+                    <a class="nav-link" href="#">{{username}}</a>
+                    <a class="nav-link active" href="/logout">Logout</a>
+                {{/username}}
+
+                <!-- 로그인하지 않은 상태 -->
+                {{^username}}
+                    <a class="nav-link active" href="/login">Login</a>
+                {{/username}}
             </div>
         </div>
     </div>
