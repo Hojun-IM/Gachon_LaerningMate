@@ -4,7 +4,6 @@ import com.gachon.learningmate.data.dto.RegisterDto;
 import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
