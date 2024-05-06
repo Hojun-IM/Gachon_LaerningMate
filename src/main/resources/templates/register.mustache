@@ -1,0 +1,70 @@
+{{>layouts/header}}
+
+<section class="vh-100 gradient-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                    <div class="card-body p-5 text-center">
+                        <h2 class="fw-bold mb-2 text-uppercase">회원가입</h2>
+                        <p class="text-white-50 mb-5">이메일 인증 및 회원 정보를 입력하세요.</p>
+
+                        <!-- 인증 코드 전송 -->
+                        <form action="/register/send-verification" method="post" modelAttribute="registerDto">
+                            <div class="form-outline form-white mb-3 d-flex align-items-center">
+                                <input type="text" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" placeholder="EMAIL" class="form-control form-control-lg flex-grow-1 me-2" />
+                                <button type="submit" class="btn btn-outline-light btn-sm" />인증 코드 전송</button>
+                            </div>
+                            <div class="text-danger mb-2" style="min-height: 8px;">{{#error_email}}{{error_email}}{{/error_email}}</div>
+                            <div class="text-success mb-2" style="min-height: 8px;">{{#message_email}}{{message_email}}{{/message_email}}</div>
+                        </form>
+
+                        <!-- 인증 코드 검증 -->
+                        <form action="/register/verify-code" method="post" modelAttribute="registerDto">
+                            <input type="hidden" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" />
+                            <div class="form-outline form-white mb-3 d-flex align-items-center">
+                                <input type="text" name="verificationCode" value="{{#registerDto}}{{registerDto.verificationCode}}{{/registerDto}}" placeholder="Verification Code" class="form-control form-control-lg flex-grow-1 me-2" />
+                                <button type="submit" class="btn btn-outline-light btn-sm" />인증 코드 확인</button>
+                            </div>
+                            <div class="text-danger mb-2" style="min-height: 15px;">{{#error_verificationCode}}{{error_verificationCode}}{{/error_verificationCode}}</div>
+                        </form>
+
+                        <hr class="my-3">
+
+                        <!-- 나머지 회원가입 정보 폼 -->
+                        <form action="/register" method="post">
+                            <input type="hidden" name="emailVerified" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}">
+
+                            <div class="form-outline form-white mb-3">
+                                <input type="text" name="userId" value="{{#registerDto}}{{registerDto.userId}}{{/registerDto}}" placeholder="ID" class="form-control form-control-lg">
+                                <div class="text-danger mb-2" style="min-height: 15px;">{{#error_userId}}{{error_userId}}{{/error_userId}}</div>
+                            </div>
+
+                            <div class="form-outline form-white mb-3">
+                                <input type="password" name="password" value="{{#registerDto}}{{registerDto.password}}{{/registerDto}}" placeholder="PASSWORD" class="form-control form-control-lg">
+                                <div class="text-danger mb-2" style="min-height: 15px;">{{#error_password}}{{error_password}}{{/error_password}}</div>
+                            </div>
+
+                            <div class="form-outline form-white mb-3">
+                                <input type="text" name="username" value="{{#registerDto}}{{registerDto.username}}{{/registerDto}}" placeholder="NAME" class="form-control form-control-lg">
+                                <div class="text-danger mb-2" style="min-height: 15px;">{{#error_username}}{{error_username}}{{/error_username}}</div>
+                            </div>
+
+                            <div class="form-outline form-white mb-3">
+                                <input type="text" name="birth" value="{{#registerDto}}{{registerDto.birth}}{{/registerDto}}" placeholder="BIRTH ex)yyyy/MM/dd" class="form-control form-control-lg">
+                                <div class="text-danger mb-2" style="min-height: 15px;">{{#error_birth}}{{error_birth}}{{/error_birth}}</div>
+                            </div>
+
+                            <button class="btn btn-outline-light btn-lg px-5" type="submit">회원가입</button>
+                            <!-- 이메일 인증 오류 메시지 -->
+                            {{#error_verification}}<div class="alert-message">{{error_verification}}</div>{{/error_verification}}
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{>layouts/footer}}
