@@ -20,7 +20,7 @@ public class RegisterDto {
     @NotBlank(message = "비밀번호는 필수 항목입니다.")
     private String password;
 
-    @Pattern(regexp = "^[가-힣a-zA-Z]{3,30}$", message = "이름은 한글 또는 영문자만 가능합니다.")
+    @Pattern(regexp = "^[가-힣a-zA-Z]{2,30}$", message = "이름은 한글 또는 영문자만 가능합니다.")
     @NotBlank(message = "이름은 필수 항목입니다.")
     private String username;
 
