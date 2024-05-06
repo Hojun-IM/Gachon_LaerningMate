@@ -1,9 +1,11 @@
 package com.gachon.learningmate.config;
 
+import com.gachon.learningmate.data.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,22 +19,30 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authrizeRequest) ->
                         authrizeRequest
-                                .requestMatchers("/", "/home", "/login", "/registerFirst", "/register/send-verification", "/register/verify-code", "/registerSecond").permitAll()  // 로그인 없이 접근 허용// 인증된 사용자만 접근 허용
-                                .requestMatchers("/css/**", "/js/**", "/img/**").permitAll() // 정적 파일 접근 허용
-                                .anyRequest().authenticated()                                      // 그 외 모든 요청은 인증 필요
+                                // 로그인 없이 접근 허용
+                                .requestMatchers("/", "/home", "/register", "/login", "/register/send-verification", "/register/verify-code").permitAll()
+                                // 정적 파일 접근 허용
+                                .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
+                                // 그 외 모든 요청은 인증 필요
+                                .anyRequest().authenticated()
                 )
                 .formLogin((formLogin) ->
                         formLogin
-                            .loginPage("/login")  // 사용자 정의 로그인 페이지
-                            .permitAll()          // 로그인 페이지 접근 허용
+                                // 사용자 정의 로그인 페이지
+                                .loginPage("/login")
+                                // 로그인 페이지 접근 허용
+                                .permitAll()
                 )
                 .logout((logout) ->
                         logout
-                            .logoutSuccessUrl("/home")  // 로그아웃 성공 시 리다이렉트할 페이지
-                            .permitAll()                // 로그인 페이지 접근 허용
+                                // 로그아웃 성공 시 리다이렉트할 페이지
+                                .logoutSuccessUrl("/home")
+                                // 로그인 페이지 접근 허용
+                                .permitAll()
                 )
                 .csrf((csrfConfig) ->
-                        csrfConfig.disable()// CSRF 보호 기능 비활성화
+                        // CSRF 보호 기능 비활성화
+                        csrfConfig.disable()
                 );
         return http.build();
     }
@@ -41,4 +51,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
