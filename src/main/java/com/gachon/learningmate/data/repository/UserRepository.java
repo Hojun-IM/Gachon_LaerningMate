@@ -4,6 +4,8 @@ import com.gachon.learningmate.data.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
     // userId를 통해 User엔티티 조회
@@ -11,4 +13,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     // email 인증을 위해 이메일 존재 여부 검색
     boolean existsByEmail(String email);
+
+    // id 인증을 위해 아이디 존재 여부 검색
+    boolean existsByUserId(String userId);
+
 }
