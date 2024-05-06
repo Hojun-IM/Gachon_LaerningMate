@@ -12,16 +12,15 @@
                             <h2 class="fw-bold mb-2 text-uppercase">로그인</h2>
                             <p class="text-white-50 mb-5">아이디와 비밀번호를 입력해주세요!</p>
 
+                            <!-- 로그인 요청 시, Spring Security가 처리 -->
                             <form action="/login" method="post">
                                 <div class="form-outline form-white mb-4">
-                                    <input type="text" name="userId" value="{{#loginDto}}{{loginDto.userId}}{{/loginDto}}" placeholder="ID" class="form-control form-control-lg" />
-                                    {{#error_userId}} <span class="alert alert-danger">{{error_userId}}</span> {{/error_userId}}
-                                    {{#loginError}} <span class="alert alert-danger">{{loginError}}</span> {{/loginError}}
+                                    <input type="text" name="username" placeholder="ID" class="form-control form-control-lg" />
                                 </div>
 
                                 <div class="form-outline form-white mb-4">
-                                    <input type="password" name="password" value="{{#loginDto}}{{loginDto.password}}{{/loginDto}}" placeholder="PASSWORD" class="form-control form-control-lg" />
-                                    {{#error_password}} <span class="alert alert-danger">{{error_password}}</span> {{/error_password}}
+                                    <input type="password" name="password" placeholder="PASSWORD" class="form-control form-control-lg" />
+                                    <div class="text-danger mb-2" style="min-height: 15px;">{{#error_message}}{{error_message}}{{/error_message}}</div>
                                 </div>
 
                                 <button class="btn btn-outline-light btn-lg px-5" type="submit">로그인</button>
@@ -31,7 +30,7 @@
                         </div>
 
                         <div>
-                            <p class="mb-0">아직 계정이 없으신가요? <a href="/registerFirst" class="text-white-50 fw-bold">회원가입</a>
+                            <p class="mb-0">아직 계정이 없으신가요? <a href="/register" class="text-white-50 fw-bold">회원가입</a>
                             </p>
                         </div>
 
