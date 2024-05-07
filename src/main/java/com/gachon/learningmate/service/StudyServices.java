@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StudyServices {
 
@@ -15,6 +17,11 @@ public class StudyServices {
     @Autowired
     public StudyServices(StudyRepository studyRepository) {
         this.studyRepository = studyRepository;
+    }
+
+    // 스터디 조회
+    public List<Study> findAllStudy() {
+        return studyRepository.findAll();
     }
 
     // 스터디 생성
