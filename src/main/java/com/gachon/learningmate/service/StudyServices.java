@@ -46,7 +46,7 @@ public class StudyServices {
     // 스터디 업데이트
     @Transactional
     public Study updateStudy(int studyId, StudyDto studyDto, User currentUser) {
-        Study study = studyRepository.findById(studyId);
+        Study study = studyRepository.findByCreatorId(currentUser);
 
         // 스터디 존재 여부 확인
         if (study == null) {
