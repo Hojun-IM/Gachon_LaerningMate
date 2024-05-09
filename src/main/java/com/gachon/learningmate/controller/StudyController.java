@@ -19,4 +19,9 @@ public class StudyController {
     public String showStudyList() {
         return "study";
     }
+
+    @GetMapping("/register-study")
+    public String showRegisterStudy() {
+        return "registerStudy";
+    }
 }
