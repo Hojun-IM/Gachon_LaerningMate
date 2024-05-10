@@ -25,6 +25,11 @@ public class UserPrincipalDetails implements UserDetails {
         return user.getUsername();
     }
 
+    // 사용자 이메일 반환
+    public String getUserEamil() {
+        return user.getEmail();
+    }
+
     // 권한 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
