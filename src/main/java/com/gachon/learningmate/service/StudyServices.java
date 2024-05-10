@@ -45,7 +45,7 @@ public class StudyServices {
 
     // 스터디 업데이트
     @Transactional
-    public Study updateStudy(int studyId, StudyDto studyDto, User currentUser) {
+    public Study updateStudy(StudyDto studyDto, User currentUser) {
         Study study = studyRepository.findByCreatorId(currentUser);
 
         // 스터디 존재 여부 확인
@@ -79,5 +79,24 @@ public class StudyServices {
     }
 
     // 스터디 삭제
+    public void deleteStudy(StudyDto studyDto, User currentUser) {
+        Study study = studyRepository.findByCreatorId(currentUser);
 
+        // 스터디 존재 여부 확인
+        if (study == null) {
+            throw new IllegalArgumentException("해당 스터디를 찾을 수 없습니다.");
+        }
+
+        // 사용자 존재 여부 확인
+        if (currentUser == null) {
+            throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
+        }
+
+        // 변경하고자 하는 스터디 생성자인지 확인
+        if (!studyDto.getCreatorId().equals(study.getCreatorId())) {
+            throw new IllegalStateException("스터디를 업데이트할 권한이 없습니다.");
+        }
+
+        studyRepository.delete(study);
+    }
 }
