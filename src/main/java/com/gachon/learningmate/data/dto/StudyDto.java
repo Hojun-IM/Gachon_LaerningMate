@@ -23,8 +23,8 @@ public class StudyDto {
     @Size(min = 10, message = "스터디 설명은 최소 10글자 이상이어야 합니다.")
     private String description;
 
-    @NotNull(message = "스터디 모집 상태는 필수 항목입니다.")
-    private StudyStatus status;
+    @Builder.Default
+    private StudyStatus status = StudyStatus.Open;
 
     @NotBlank(message = "스터디 카테고리는 필수 항목입니다.")
     private String category;
