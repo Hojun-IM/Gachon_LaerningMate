@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 public class StudyDto {
 
-    @NotBlank(message = "생성자 ID는 필수 항목입니다.")
+    @NotNull(message = "생성자 ID는 필수 항목입니다.")
     private User creatorId;
 
     @NotBlank(message = "스터디명은 필수 항목입니다.")
@@ -38,8 +38,9 @@ public class StudyDto {
     @Max(value = 50, message = "최대 멤버 수는 50명입니다.")
     private int maxMember;
 
+    @Builder.Default
     @Min(value = 1, message = "현재 멤버 수는 최소 1명입니다.")
-    private int currentMember;
+    private int currentMember = 1;
 
     // 현재 멤버 수가 최대 멤버 수 초과 불가
     @AssertTrue(message = "현재 멤버 수는 최대 멤버 수를 초과할 수 없습니다.")
@@ -47,4 +48,17 @@ public class StudyDto {
         return currentMember <= maxMember;
     }
 
+    @Override
+    public String toString() {
+        return "StudyDto{" +
+                "creatorId=" + creatorId +
+                ", studyName='" + studyName + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", category='" + category + '\'' +
+                ", location='" + location + '\'' +
+                ", maxMember=" + maxMember +
+                ", currentMember=" + currentMember +
+                '}';
+    }
 }
