@@ -12,7 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 public class StudyDto {
 
-    @NotNull(message = "생성자 ID는 필수 항목입니다.")
     private User creatorId;
 
     @NotBlank(message = "스터디명은 필수 항목입니다.")
