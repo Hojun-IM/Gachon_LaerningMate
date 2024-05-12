@@ -4,6 +4,8 @@ import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.entity.Study;
 import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.StudyRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,7 @@ public class StudyServices {
                 .location(studyDto.getLocation())
                 .maxMember(studyDto.getMaxMember())
                 .currentMember(studyDto.getCurrentMember())
+                .photoPath(studyDto.getPhotoPath())
                 .build();
 
         studyRepository.save(study);
