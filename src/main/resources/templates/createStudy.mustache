@@ -1,67 +1,68 @@
 {{>layouts/header}}
 
-<div class="container py-5">
-    <div class="row d-flex justify-content-center align-items-center" style="height: 100%;">
-        <div class="col-12 col-lg-10">
-            <div class="card text-white" style="border-radius: 1rem; background-color: #002244;">
-                <div class="card-body p-5">
+<section class="h-100 h-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-lg-8 col-xl-6">
+                <div class="card rounded-3">
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/img3.webp"
+                         class="w-100" style="border-top-left-radius: .3rem; border-top-right-radius: .3rem;"
+                         alt="Sample photo">
+                    <div class="card-body p-4 p-md-5">
+                        <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2">스터디 정보</h3>
 
-                    <form action="/study-create" method="post">
+                        <form class="px-md-2" action="/study-create" method="post">
 
-                        <div class="row">
-                            <!-- Image Upload Section -->
-                            <div class="col-md-6 mb-4">
-                                <div class="image-preview mb-4" style="width: 400px; height: 225px; border: 1px solid #ccc;">
-                                    <!-- Preview will be shown here -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="text" class="form-control" name="username" value="{{username}}" disabled/>
+                            </div>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="text" class="form-control" name="email" value="{{email}}" disabled/>
+                            </div>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="text" class="form-control" name="studyName" value="{{#studyDto}}{{studyDto.studyName}}{{/studyDto}}" placeholder="스터디명"/>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+
+                                    <div data-mdb-input-init class="form-outline datepicker">
+                                        <input type="text" class="form-control" name="maxMember" value="{{#studyDto}}{{studyDto.maxMember}}{{/studyDto}}" placeholder="모집인원(최대50명)"/>
+                                    </div>
+
                                 </div>
-                                <div class="input-group">
-                                    <input type="file" class="form-control" id="file-upload">
-                                    <label class="input-group-text" for="file-upload">Upload</label>
+                                <div class="col-md-6 mb-4">
+
+                                    <div data-mdb-input-init class="form-outline datepicker">
+                                        <input type="text" class="form-control" name="category" value="{{#studyDto}}{{studyDto.category}}{{/studyDto}}" placeholder="카테고리"/>
+                                    </div>
+
                                 </div>
                             </div>
 
-                            <!-- User Input Section -->
-                            <div class="col-md-6 mb-4">
-                                <div class="input-group mb-4">
-                                    <span class="input-group-text"><i class="bi-person"></i></span>
-                                    <input type="text" class="form-control" name="username" value="{{username}}" placeholder="사용자명" readonly>
-                                </div>
-                                <div class="input-group mb-4">
-                                    <span class="input-group-text">@</span>
-                                    <input type="text" class="form-control" name="email" value="{{email}}" placeholder="이메일" readonly>
-                                </div>
-                                <div class="input-group mb-4">
-                                    <span class="input-group-text">#</span>
-                                    <input type="text" class="form-control" name="maxMember" value="{{#studyDto}}{{studyDto.maxMember}}{{/studyDto}}" placeholder="인원수(최대50명)">
-                                </div>
-                                <div class="input-group mb-4">
-                                    <span class="input-group-text">스터디명</span>
-                                    <input type="text" class="form-control" name="studyName" value="{{#studyDto}}{{studyDto.studyName}}{{/studyDto}}" placeholder="스터디명">
-                                </div>
-                                <div class="input-group mb-4">
-                                    <span class="input-group-text">카테고리</span>
-                                    <input type="text" class="form-control" name="category" value="{{#studyDto}}{{studyDto.category}}{{/studyDto}}" placeholder="카테고리">
-                                </div>
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="text" class="form-control" name="location" value="{{#studyDto}}{{studyDto.location}}{{/studyDto}}" placeholder="활동 장소"/>
                             </div>
-                        </div>
 
-                        <div class="input-group mb-4">
-                            <span class="input-group-text">스터디 장소</span>
-                            <input type="text" class="form-control" name="location" value="{{#studyDto}}{{studyDto.location}}{{/studyDto}}" placeholder="스터디 장소">
-                        </div>
-                        <div class="input-group mb-4">
-                            <span class="input-group-text">스터디 설명</span>
-                            <textarea class="form-control" name="description" {{#studyDto}}{{studyDto.description}}{{/studyDto}} placeholder="이곳에 스터디에 대한 설명을 적어주세요!"></textarea>
-                        </div>
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <textarea class="form-control" name="description" placeholder="스터디 설명">{{#studyDto}}{{studyDto.description}}{{/studyDto}}</textarea>
+                            </div>
 
-                        <button type="submit" class="btn btn-primary">등록</button>
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="file" class="form-control" id="file-upload">
+                            </div>
 
-                    </form>
+                            <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-success btn-lg mb-1">등록</button>
 
+                        </form>
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 {{>layouts/footer}}
