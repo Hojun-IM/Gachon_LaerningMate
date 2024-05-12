@@ -23,35 +23,38 @@
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <input type="text" class="form-control" name="studyName" value="{{#studyDto}}{{studyDto.studyName}}{{/studyDto}}" placeholder="스터디명"/>
+                                <div class="text-danger" style="min-height: 8px;">{{#error_studyName}}{{error_studyName}}{{/error_studyName}}</div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-
                                     <div data-mdb-input-init class="form-outline datepicker">
                                         <input type="text" class="form-control" name="maxMember" value="{{#studyDto}}{{studyDto.maxMember}}{{/studyDto}}" placeholder="모집인원(최대50명)"/>
+                                        <div class="text-danger" style="min-height: 8px;">{{#error_maxMember}}{{error_maxMember}}{{/error_maxMember}}</div>
                                     </div>
-
                                 </div>
-                                <div class="col-md-6 mb-4">
 
+                                <div class="col-md-6 mb-4">
                                     <div data-mdb-input-init class="form-outline datepicker">
                                         <input type="text" class="form-control" name="category" value="{{#studyDto}}{{studyDto.category}}{{/studyDto}}" placeholder="카테고리"/>
+                                        <div class="text-danger" style="min-height: 8px;">{{#error_category}}{{error_category}}{{/error_category}}</div>
                                     </div>
-
                                 </div>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <input type="text" class="form-control" name="location" value="{{#studyDto}}{{studyDto.location}}{{/studyDto}}" placeholder="활동 장소"/>
+                                <div class="text-danger" style="min-height: 8px;">{{#error_location}}{{error_location}}{{/error_location}}</div>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <textarea class="form-control" name="description" placeholder="스터디 설명">{{#studyDto}}{{studyDto.description}}{{/studyDto}}</textarea>
+                                <div class="text-danger" style="min-height: 8px;">{{#error_description}}{{error_description}}{{/error_description}}</div>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <input type="file" class="form-control" id="file-upload">
+                                <div class="text-danger" style="min-height: 8px;"></div>
                             </div>
 
                             <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-success btn-lg mb-1">등록</button>
