@@ -4,11 +4,15 @@ import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.entity.Study;
 import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.StudyRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StudyServices {
@@ -98,5 +102,17 @@ public class StudyServices {
         }
 
         studyRepository.delete(study);
+    }
+
+    // 스터디 DTO에 설정된 유효성 검사
+    @Transactional(readOnly = true)
+    public Map<String, String> validateHandling(BindingResult result) {
+        Map<String, String> validatorResult = new HashMap<>();
+        // 유효성 검사 실패한 필드 목록 받아오기
+        for (FieldError error : result.getFieldErrors()) {
+            String errorKey = String.format("error_%s", error.getField());
+            validatorResult.put(errorKey, error.getDefaultMessage());
+        }
+        return validatorResult;
     }
 }
