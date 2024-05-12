@@ -5,7 +5,9 @@
         <div class="col-12 col-lg-10">
             <div class="card text-white" style="border-radius: 1rem; background-color: #002244;">
                 <div class="card-body p-5">
+
                     <form action="/study-create" method="post">
+
                         <div class="row">
                             <!-- Image Upload Section -->
                             <div class="col-md-6 mb-4">
@@ -17,6 +19,7 @@
                                     <label class="input-group-text" for="file-upload">Upload</label>
                                 </div>
                             </div>
+
                             <!-- User Input Section -->
                             <div class="col-md-6 mb-4">
                                 <div class="input-group mb-4">
@@ -29,28 +32,32 @@
                                 </div>
                                 <div class="input-group mb-4">
                                     <span class="input-group-text">#</span>
-                                    <input type="text" class="form-control" name="maxMember" placeholder="인원수(최대50명)">
+                                    <input type="text" class="form-control" name="maxMember" value="{{#studyDto}}{{studyDto.maxMember}}{{/studyDto}}" placeholder="인원수(최대50명)">
                                 </div>
                                 <div class="input-group mb-4">
                                     <span class="input-group-text">스터디명</span>
-                                    <input type="text" class="form-control" name="studyName" placeholder="스터디명">
+                                    <input type="text" class="form-control" name="studyName" value="{{#studyDto}}{{studyDto.studyName}}{{/studyDto}}" placeholder="스터디명">
                                 </div>
                                 <div class="input-group mb-4">
                                     <span class="input-group-text">카테고리</span>
-                                    <input type="text" class="form-control" name="category" placeholder="카테고리">
+                                    <input type="text" class="form-control" name="category" value="{{#studyDto}}{{studyDto.category}}{{/studyDto}}" placeholder="카테고리">
                                 </div>
                             </div>
                         </div>
+
                         <div class="input-group mb-4">
                             <span class="input-group-text">스터디 장소</span>
-                            <input type="text" class="form-control" name="location" placeholder="스터디 장소">
+                            <input type="text" class="form-control" name="location" value="{{#studyDto}}{{studyDto.location}}{{/studyDto}}" placeholder="스터디 장소">
                         </div>
                         <div class="input-group mb-4">
                             <span class="input-group-text">스터디 설명</span>
-                            <textarea class="form-control" name="description" placeholder="이곳에 스터디에 대한 설명을 적어주세요!"></textarea>
+                            <textarea class="form-control" name="description" {{#studyDto}}{{studyDto.description}}{{/studyDto}} placeholder="이곳에 스터디에 대한 설명을 적어주세요!"></textarea>
                         </div>
+
                         <button type="submit" class="btn btn-primary">등록</button>
+
                     </form>
+
                 </div>
             </div>
         </div>
