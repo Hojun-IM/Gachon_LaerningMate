@@ -14,11 +14,9 @@ public class StudyDto {
 
     private User creatorId;
 
-    @NotBlank(message = "스터디명은 필수 항목입니다.")
     @Size(min = 2, max = 15, message = "스터디명은 2글자에서 15글자 사이여야 합니다.")
     private String studyName;
 
-    @NotBlank(message = "스터디 설명은 필수 항목입니다.")
     @Size(min = 10, message = "스터디 설명은 최소 10글자 이상이어야 합니다.")
     private String description;
 
@@ -28,11 +26,9 @@ public class StudyDto {
     @NotBlank(message = "스터디 카테고리는 필수 항목입니다.")
     private String category;
 
-    @NotBlank(message = "활동 장소는 필수 항목입니다.")
     @Size(min = 2, message = "활동 장소는 최소 2글자 이상이어야 합니다.")
     private String location;
 
-    @NotNull(message = "최대 활동 멤버는 필수 항목입니다.")
     @Min(value = 1, message = "최소 멤버 수는 1명입니다.")
     @Max(value = 50, message = "최대 멤버 수는 50명입니다.")
     private int maxMember;
