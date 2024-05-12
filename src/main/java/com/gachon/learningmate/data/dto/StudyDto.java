@@ -37,6 +37,8 @@ public class StudyDto {
     @Min(value = 1, message = "현재 멤버 수는 최소 1명입니다.")
     private int currentMember = 1;
 
+    private String photoPath;
+
     // 현재 멤버 수가 최대 멤버 수 초과 불가
     @AssertTrue(message = "현재 멤버 수는 최대 멤버 수를 초과할 수 없습니다.")
     public boolean isCurrentMemberValid() {

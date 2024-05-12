@@ -59,4 +59,7 @@ public class Study {
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
+    // 사진 경로
+    @Column(nullable = false)
+    private String photoPath;
 }
