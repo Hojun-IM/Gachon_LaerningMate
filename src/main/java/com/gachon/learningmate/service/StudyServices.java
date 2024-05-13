@@ -1,23 +1,30 @@
 package com.gachon.learningmate.service;
 
+import com.gachon.learningmate.config.FileUploadUtil;
 import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.entity.Study;
 import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.StudyRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
 public class StudyServices {
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     private final StudyRepository studyRepository;
 
@@ -27,8 +34,8 @@ public class StudyServices {
     }
 
     // 스터디 조회
-    public List<Study> findAllStudy() {
-        return studyRepository.findAll();
+    public Page<Study> findAllStudy(Pageable pageable) {
+        return studyRepository.findAll(pageable);
     }
 
     // 스터디 생성
@@ -118,4 +125,26 @@ public class StudyServices {
         }
         return validatorResult;
     }
+
+    @Transactional
+    public boolean validatePhoto(MultipartFile photo, StudyDto studyDto) throws IOException {
+
+        // 사진 파일 유효성 검사
+        if (!FileUploadUtil.isExtensionValid(photo)){
+            throw new IOException("허용되는 파일 형식은 jpg, jpeg, png입니다.");
+        }
+
+        // 기본 사진 설정
+        if (photo == null || photo.isEmpty()) {
+            studyDto.setPhotoPath("/img/default-study.jpg");
+            return true;
+        }
+
+        // 파일 처리
+        String fileName = StringUtils.cleanPath(photo.getOriginalFilename());
+        FileUploadUtil.saveFile(uploadDir, fileName, photo);
+        studyDto.setPhotoPath("/img/study-logo/" + fileName);
+        return true;
+    }
+
 }
