@@ -41,75 +41,23 @@ public class StudyServices {
     // 스터디 생성
     @Transactional
     public void createStudy(StudyDto studyDto) {
-
-        Study study = Study.builder()
-                .creatorId(studyDto.getCreatorId())
-                .studyName(studyDto.getStudyName())
-                .description(studyDto.getDescription())
-                .status(studyDto.getStatus())
-                .category(studyDto.getCategory())
-                .location(studyDto.getLocation())
-                .maxMember(studyDto.getMaxMember())
-                .currentMember(studyDto.getCurrentMember())
-                .photoPath(studyDto.getPhotoPath())
-                .build();
-
+        Study study = buildStudy(studyDto);
         studyRepository.save(study);
     }
 
     // 스터디 업데이트
     @Transactional
     public Study updateStudy(StudyDto studyDto, User currentUser) {
-        Study study = studyRepository.findByCreatorId(currentUser);
-
-        // 스터디 존재 여부 확인
-        if (study == null) {
-            throw new IllegalArgumentException("해당 스터디를 찾을 수 없습니다.");
-        }
-
-        // 사용자 존재 여부 확인
-        if (currentUser == null) {
-            throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
-        }
-
-        // 변경하고자 하는 스터디 생성자인지 확인
-        if (!studyDto.getCreatorId().equals(study.getCreatorId())) {
-            throw new IllegalStateException("스터디를 업데이트할 권한이 없습니다.");
-        }
+        Study study = validateStudyAndUser(studyDto, currentUser);
 
         // 변경 정보 업데이트
-        study = Study.builder()
-                .creatorId(studyDto.getCreatorId())
-                .studyName(studyDto.getStudyName())
-                .description(studyDto.getDescription())
-                .status(studyDto.getStatus())
-                .category(studyDto.getCategory())
-                .location(studyDto.getLocation())
-                .maxMember(studyDto.getMaxMember())
-                .currentMember(studyDto.getCurrentMember())
-                .build();
-
+        study = buildStudy(studyDto);
         return studyRepository.save(study);
     }
 
     // 스터디 삭제
     public void deleteStudy(StudyDto studyDto, User currentUser) {
-        Study study = studyRepository.findByCreatorId(currentUser);
-
-        // 스터디 존재 여부 확인
-        if (study == null) {
-            throw new IllegalArgumentException("해당 스터디를 찾을 수 없습니다.");
-        }
-
-        // 사용자 존재 여부 확인
-        if (currentUser == null) {
-            throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
-        }
-
-        // 변경하고자 하는 스터디 생성자인지 확인
-        if (!studyDto.getCreatorId().equals(study.getCreatorId())) {
-            throw new IllegalStateException("스터디를 업데이트할 권한이 없습니다.");
-        }
+        Study study = validateStudyAndUser(studyDto, currentUser);
 
         studyRepository.delete(study);
     }
@@ -145,6 +93,38 @@ public class StudyServices {
         FileUploadUtil.saveFile(uploadDir, fileName, photo);
         studyDto.setPhotoPath("/img/study-logo/" + fileName);
         return true;
+    }
+
+    // 스터디 엔티티 빌드
+    private Study buildStudy(StudyDto studyDto) {
+        return Study.builder()
+                .creatorId(studyDto.getCreatorId())
+                .studyName(studyDto.getStudyName())
+                .description(studyDto.getDescription())
+                .status(studyDto.getStatus())
+                .category(studyDto.getCategory())
+                .location(studyDto.getLocation())
+                .maxMember(studyDto.getMaxMember())
+                .currentMember(studyDto.getCurrentMember())
+                .photoPath(studyDto.getPhotoPath())
+                .build();
+    }
+
+    // 스터디와 사용자 유효성 검사
+    private Study validateStudyAndUser(StudyDto studyDto, User currentUser) {
+        Study study = studyRepository.findByCreatorId(currentUser);
+        if (study == null) {
+            throw new IllegalArgumentException("해당 스터디를 찾을 수 없습니다.");
+        }
+
+        if (currentUser == null) {
+            throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
+        }
+
+        if (!studyDto.getCreatorId().equals(study.getCreatorId())) {
+            throw new IllegalStateException("스터디를 업데이트할 권한이 없습니다.");
+        }
+        return study;
     }
 
 }
