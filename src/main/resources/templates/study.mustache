@@ -3,12 +3,12 @@
 <!-- Study List -->
 <div class="container">
 
-    <h1 class="fw-light text-center text-lg-start mt-4 mb-0">스터디</h1>
+    <h1 class="fw-light text-center text-lg-start mt-4 mb-0">스터디 목록</h1>
     <hr class="mt-2 mb-5">
 
     <div class="row text-center text-lg-start">
         <!--Study template-->
-        {{#study}}
+        {{#studies}}
             <div class="col-lg-3 col-md-4 col-6">
                 <div class="study-card">
                     <a href="#" class="d-block mb-4 h-100">
@@ -19,12 +19,34 @@
                     </a>
                 </div>
             </div>
-        {{/study}}
+        {{/studies}}
 
         <!-- Pagination -->
+        <div class="mt-4">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {{^hasPrevious}}disabled{{/hasPrevious}}">
+                    <a class="page-link" href="{{#hasPrevious}}/study?page={{prevPage}}{{/hasPrevious}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {{#pages}}
+                        <li class="page-item {{#isCurrent}}{{currentPage}}{{/isCurrent}}active">
+                            <a class="page-link" href="/study?page={{.}}">{{.}}</a>
+                        </li>
+                    {{/pages}}
+                    <li class="page-item {{^hasNext}}disabled{{/hasNext}}">
+                    <a class="page-link" href="{{#hasNext}}/study?page={{nextPage}}{{/hasNext}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
 
     </div>
 
 </div>
+
 
 {{>layouts/footer}}
