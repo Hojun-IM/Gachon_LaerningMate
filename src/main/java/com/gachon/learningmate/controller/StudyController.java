@@ -45,7 +45,7 @@ public class StudyController {
         Page<Study> studyPage = studyServices.findAllStudy(PageRequest.of(pageIndex, pageSize));
 
         model.addAttribute("studies", studyPage.getContent());
-        model.addAttribute("currentPage", page); // 사용자 친화적 페이지 번호 (1부터 시작)
+        model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", studyPage.getTotalPages());
         model.addAttribute("hasNext", studyPage.hasNext());
         model.addAttribute("hasPrevious", studyPage.hasPrevious());
@@ -54,7 +54,11 @@ public class StudyController {
 
         // 페이지 목록 생성
         int totalPages = studyPage.getTotalPages();
-        List<Integer> pages = IntStream.rangeClosed(1, totalPages)
+        int currentRange = (int) Math.ceil((double) page / 10);
+        int startPage = (currentRange - 1) * 10 + 1;
+        int endPage = Math.min(totalPages, currentRange * 10);
+
+        List<Integer> pages = IntStream.rangeClosed(startPage, endPage)
                 .boxed()
                 .collect(Collectors.toList());
         model.addAttribute("pages", pages);
