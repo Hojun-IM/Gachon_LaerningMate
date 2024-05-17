@@ -21,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 public class StudyController {
@@ -34,15 +36,32 @@ public class StudyController {
 
     // 스터디 목록 페이지 출력
     @GetMapping("/study")
-    public String showStudyList(Model model, @RequestParam(defaultValue = "0") int page) {
-        int pageSize = 12; // 한 페이지에 보여줄 아이템 수
-        Page<Study> studyPage = studyServices.findAllStudy(PageRequest.of(page, pageSize));
-        model.addAttribute("study", studyPage.getContent());
-        model.addAttribute("currentPage", page);
+    public String showStudyList(Model model, @RequestParam(defaultValue = "1") int page) {
+        // 한 페이지에 보여줄 아이템 수
+        int pageSize = 12;
+        // PageRequest는 페이지 번호가 0부터 시작하므로, 사용자 입력에서 1을 빼줍니다.
+        // 하지만 페이지가 1 이하일 경우, 0으로 설정합니다.
+        int pageIndex = (page < 1) ? 0 : page - 1;
+        Page<Study> studyPage = studyServices.findAllStudy(PageRequest.of(pageIndex, pageSize));
+
+        model.addAttribute("studies", studyPage.getContent());
+        model.addAttribute("currentPage", page); // 사용자 친화적 페이지 번호 (1부터 시작)
         model.addAttribute("totalPages", studyPage.getTotalPages());
-        model.addAttribute("totalItems", studyPage.getTotalElements());
+        model.addAttribute("hasNext", studyPage.hasNext());
+        model.addAttribute("hasPrevious", studyPage.hasPrevious());
+        model.addAttribute("nextPage", page + 1);
+        model.addAttribute("prevPage", (page > 1) ? page - 1 : 1);
+
+        // 페이지 목록 생성
+        int totalPages = studyPage.getTotalPages();
+        List<Integer> pages = IntStream.rangeClosed(1, totalPages)
+                .boxed()
+                .collect(Collectors.toList());
+        model.addAttribute("pages", pages);
+
         return "study"; // 스터디 목록을 보여줄 뷰 이름
     }
+
 
     // 스터디 생성 페이지 출력
     @GetMapping("/study-create")
