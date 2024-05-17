@@ -26,17 +26,27 @@
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center">
                     <li class="page-item {{^hasPrevious}}disabled{{/hasPrevious}}">
+                        <a class="page-link" href="/study?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item {{^hasPrevious}}disabled{{/hasPrevious}}">
                     <a class="page-link" href="{{#hasPrevious}}/study?page={{prevPage}}{{/hasPrevious}}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
+                        <span aria-hidden="true">&lsaquo;</span>
                         </a>
                     </li>
                     {{#pages}}
-                        <li class="page-item {{#isCurrent}}{{currentPage}}{{/isCurrent}}active">
+                        <li class="page-item {{#isCurrent}}active{{/isCurrent}}">
                             <a class="page-link" href="/study?page={{.}}">{{.}}</a>
                         </li>
                     {{/pages}}
                     <li class="page-item {{^hasNext}}disabled{{/hasNext}}">
                     <a class="page-link" href="{{#hasNext}}/study?page={{nextPage}}{{/hasNext}}" aria-label="Next">
+                        <span aria-hidden="true">&rsaquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item {{^hasNext}}disabled{{/hasNext}}">
+                        <a class="page-link" href="/study?page={{totalPages}}" aria-label="Last">
                         <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
