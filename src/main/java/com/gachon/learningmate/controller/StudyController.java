@@ -1,5 +1,6 @@
 package com.gachon.learningmate.controller;
 
+import com.gachon.learningmate.config.PageItem;
 import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
 import com.gachon.learningmate.data.entity.Study;
@@ -21,8 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Controller
 public class StudyController {
@@ -44,23 +43,23 @@ public class StudyController {
         int pageIndex = (page < 1) ? 0 : page - 1;
         Page<Study> studyPage = studyServices.findAllStudy(PageRequest.of(pageIndex, pageSize));
 
+        // 현재 페이지의 스터디 목록
         model.addAttribute("studies", studyPage.getContent());
+        // 현재 페이지 번호 (1부터 시작)
         model.addAttribute("currentPage", page);
+        // 전체 페이지 수
         model.addAttribute("totalPages", studyPage.getTotalPages());
+        // 다음 페이지가 있는지의 여부
         model.addAttribute("hasNext", studyPage.hasNext());
+        // 이전 페이지가 있는지의 여부
         model.addAttribute("hasPrevious", studyPage.hasPrevious());
+        // 다음 페이지 번호
         model.addAttribute("nextPage", page + 1);
+        // 이전 페이지 번호 (1보다 클 경우만 -1 적용)
         model.addAttribute("prevPage", (page > 1) ? page - 1 : 1);
 
         // 페이지 목록 생성
-        int totalPages = studyPage.getTotalPages();
-        int currentRange = (int) Math.ceil((double) page / 10);
-        int startPage = (currentRange - 1) * 10 + 1;
-        int endPage = Math.min(totalPages, currentRange * 10);
-
-        List<Integer> pages = IntStream.rangeClosed(startPage, endPage)
-                .boxed()
-                .collect(Collectors.toList());
+        List<PageItem> pages = PageItem.createPageItems(page, studyPage.getTotalPages());
         model.addAttribute("pages", pages);
 
         return "study"; // 스터디 목록을 보여줄 뷰 이름
