@@ -37,7 +37,7 @@
                     </li>
                     {{#pages}}
                         <li class="page-item {{#isCurrent}}active{{/isCurrent}}">
-                            <a class="page-link" href="/study?page={{.}}">{{.}}</a>
+                            <a class="page-link" href="/study?page={{page}}">{{page}}</a>
                         </li>
                     {{/pages}}
                     <li class="page-item {{^hasNext}}disabled{{/hasNext}}">
