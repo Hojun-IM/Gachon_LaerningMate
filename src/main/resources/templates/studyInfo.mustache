@@ -16,36 +16,43 @@
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2">스터디 정보</h3>
 
                             <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="username" class="form-label">스터디장</label>
                                 <input type="text" class="form-control" name="username" value="{{#study}}{{study.creatorId.username}}{{/study}}" disabled/>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="email" class="form-label">스터디장 이메일</label>
                                 <input type="text" class="form-control" name="email" value="{{#study}}{{study.creatorId.email}}{{/study}}" disabled/>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="studyName" class="form-label">스터디명</label>
                                 <input type="text" class="form-control" name="studyName" value="{{#study}}{{study.studyName}}{{/study}}" disabled/>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">
                                     <div data-mdb-input-init class="form-outline datepicker">
+                                        <label for="maxMember" class="form-label">최대 인원</label>
                                         <input type="text" class="form-control" name="maxMember" value="{{#study}}{{study.maxMember}}{{/study}}" disabled/>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6 mb-4">
                                     <div data-mdb-input-init class="form-outline datepicker">
+                                        <label for="category" class="form-label">카테고리</label>
                                         <input type="text" class="form-control" name="category" value="{{#study}}{{study.category}}{{/study}}" disabled/>
                                     </div>
                                 </div>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="location" class="form-label">활동 장소</label>
                                 <input type="text" class="form-control" name="location" value="{{#study}}{{study.location}}{{/study}}" disabled/>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="description" class="form-label">스터디 소개</label>
                                 <textarea class="form-control" name="description" placeholder="스터디 설명" disabled>{{#study}}{{study.description}}{{/study}}</textarea>
                             </div>
                         </div>
