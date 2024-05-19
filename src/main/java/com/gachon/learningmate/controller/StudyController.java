@@ -130,4 +130,16 @@ public class StudyController {
         return "studyInfo";
     }
 
+    @PostMapping("/delete-study")
+    public String deleteStudy(@RequestParam int studyId) {
+        // 현재 로그인 된 유저 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipalDetails userPrincipalDetails = (UserPrincipalDetails) authentication.getPrincipal();
+
+        Study study = studyRepository.findByStudyId(studyId);
+        studyServices.deleteStudy(study, userPrincipalDetails);
+
+        return "redirect:/study";
+    }
+
 }
