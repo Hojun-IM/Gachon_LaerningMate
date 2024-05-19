@@ -2,8 +2,8 @@ package com.gachon.learningmate.service;
 
 import com.gachon.learningmate.config.FileUploadUtil;
 import com.gachon.learningmate.data.dto.StudyDto;
+import com.gachon.learningmate.data.dto.UserPrincipalDetails;
 import com.gachon.learningmate.data.entity.Study;
-import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -47,19 +47,25 @@ public class StudyServices {
 
     // 스터디 업데이트
     @Transactional
-    public Study updateStudy(StudyDto studyDto, User currentUser) {
-        Study study = validateStudyAndUser(studyDto, currentUser);
-
-        // 변경 정보 업데이트
-        study = buildStudy(studyDto);
-        return studyRepository.save(study);
+    public Study updateStudy(StudyDto studyDto, Study study, UserPrincipalDetails currentUser) {
+        try {
+            validateStudyAndUser(study, currentUser);
+            // 변경 정보 업데이트
+            study = buildStudy(studyDto);
+            return studyRepository.save(study);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     // 스터디 삭제
-    public void deleteStudy(StudyDto studyDto, User currentUser) {
-        Study study = validateStudyAndUser(studyDto, currentUser);
-
-        studyRepository.delete(study);
+    public void deleteStudy(Study study, UserPrincipalDetails currentUser) {
+        try {
+            validateStudyAndUser(study, currentUser);
+            studyRepository.delete(study);
+        } catch (RuntimeException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     // 스터디 DTO에 설정된 유효성 검사
@@ -111,9 +117,8 @@ public class StudyServices {
     }
 
     // 스터디와 사용자 유효성 검사
-    private Study validateStudyAndUser(StudyDto studyDto, User currentUser) {
-        Study study = studyRepository.findByCreatorId(currentUser);
-        if (study == null) {
+    private boolean validateStudyAndUser(Study study, UserPrincipalDetails currentUser) {
+        if (!studyRepository.existsByStudyId(study.getStudyId())) {
             throw new IllegalArgumentException("해당 스터디를 찾을 수 없습니다.");
         }
 
@@ -121,10 +126,10 @@ public class StudyServices {
             throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
         }
 
-        if (!studyDto.getCreatorId().equals(study.getCreatorId())) {
+        if (!study.getCreatorId().equals(study.getCreatorId())) {
             throw new IllegalStateException("스터디를 업데이트할 권한이 없습니다.");
         }
-        return study;
+        return true;
     }
 
 }
