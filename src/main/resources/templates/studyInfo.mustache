@@ -55,6 +55,17 @@
                                 <label for="description" class="form-label">스터디 소개</label>
                                 <textarea class="form-control" name="description" placeholder="스터디 설명" disabled>{{#study}}{{study.description}}{{/study}}</textarea>
                             </div>
+                            {{#isCreator}}
+                                <a href="/edit-study?studyId={{#study}}{{study.studyId}}{{/study}}" class="btn btn-primary btn-lg mb-1">스터디 수정</a>
+                                <form action="/delete-study" method="post" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
+                                    <input type="hidden" name="delete" value="DELETE">
+                                    <input type="hidden" name="studyId" value="{{#study}}{{study.studyId}}{{/study}}">
+                                    <button type="submit" class="btn btn-danger btn-lg mb-1">스터디 삭제</button>
+                                </form>
+                            {{/isCreator}}
+                            {{^isCreator}}
+                                <a href="/participate?studyId={{#study}}{{study.studyId}}{{/study}}" class="btn btn-success btn-lg mb-1">스터디 신청</a>
+                            {{/isCreator}}
                         </div>
                     </div>
 
