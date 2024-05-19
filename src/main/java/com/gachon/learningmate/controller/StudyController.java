@@ -9,18 +9,17 @@ import com.gachon.learningmate.service.StudyServices;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
@@ -119,11 +118,16 @@ public class StudyController {
 
     @GetMapping("/study-info")
     public String showStudyInfo(Model model, @RequestParam int studyId) {
+        // 현재 로그인 된 유저 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserId = authentication.getName();
 
         Study study = studyRepository.findByStudyId(studyId);
 
         model.addAttribute("study", study);
+        model.addAttribute("isCreator", study.getCreatorId().getUserId().equals(currentUserId));
 
         return "studyInfo";
     }
+
 }
