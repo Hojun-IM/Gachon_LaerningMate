@@ -127,7 +127,7 @@ public class StudyServices {
         }
 
         if (!study.getCreatorId().equals(study.getCreatorId())) {
-            throw new IllegalStateException("스터디를 업데이트할 권한이 없습니다.");
+            throw new IllegalStateException("스터디에 대한 권한이 없습니다.");
         }
         return true;
     }
