@@ -140,5 +140,12 @@ public class StudyController {
         return "redirect:/study";
     }
 
+    @GetMapping("/update")
+    public String showUpdateStudy(Model model, @RequestParam int studyId) {
+        Study study = studyRepository.findByStudyId(studyId);
+        StudyDto studyDto = studyServices.buildStudyDto(study);
 
+        model.addAttribute("studyDto", studyDto);
+        return "studyUpdate";
+    }
 }
