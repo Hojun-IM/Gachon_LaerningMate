@@ -12,6 +12,8 @@ import lombok.*;
 @AllArgsConstructor
 public class StudyDto {
 
+    private int id;
+
     private User creatorId;
 
     @Size(min = 2, max = 15, message = "스터디명은 2글자에서 15글자 사이여야 합니다.")
