@@ -116,6 +116,21 @@ public class StudyServices {
                 .build();
     }
 
+    // DB값 DTO로 가져오기
+    public StudyDto buildStudyDto(Study study) {
+        StudyDto studyDto = new StudyDto();
+        studyDto.setCreatorId(study.getCreatorId());
+        studyDto.setStudyName(study.getStudyName());
+        studyDto.setDescription(study.getDescription());
+        studyDto.setStatus(study.getStatus());
+        studyDto.setCategory(study.getCategory());
+        studyDto.setLocation(study.getLocation());
+        studyDto.setMaxMember(study.getMaxMember());
+        studyDto.setCurrentMember(study.getCurrentMember());
+        studyDto.setPhotoPath(study.getPhotoPath());
+        return studyDto;
+    }
+
     // 스터디와 사용자 유효성 검사
     private boolean validateStudyAndUser(Study study, UserPrincipalDetails currentUser) {
         if (!studyRepository.existsByStudyId(study.getStudyId())) {
