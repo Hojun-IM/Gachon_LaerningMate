@@ -15,10 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@RequestMapping("/study")
 public class StudyController {
 
     private final StudyServices studyServices;
@@ -38,7 +36,7 @@ public class StudyController {
     }
 
     // 스터디 생성 페이지 출력
-    @GetMapping("/study-create")
+    @GetMapping("/create")
     public String showCreateStudy(Model model) {
         // 현재 로그인 된 유저 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -50,7 +48,7 @@ public class StudyController {
     }
 
     // 스터디 생성
-    @PostMapping("/study-create")
+    @PostMapping("/create")
     public String createStudy(@RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
         // 현재 로그인 된 유저 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -85,7 +83,7 @@ public class StudyController {
     }
 
     // 스터디 목록 페이지 출력
-    @GetMapping("/study")
+    @GetMapping
     public String showStudyList(Model model, @RequestParam(defaultValue = "1") int page) {
         // 한 페이지에 보여줄 아이템 수
         int pageSize = 12;
@@ -116,7 +114,7 @@ public class StudyController {
         return "study"; // 스터디 목록을 보여줄 뷰 이름
     }
 
-    @GetMapping("/study-info")
+    @GetMapping("/info")
     public String showStudyInfo(Model model, @RequestParam int studyId) {
         // 현재 로그인 된 유저 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -130,7 +128,7 @@ public class StudyController {
         return "studyInfo";
     }
 
-    @PostMapping("/delete-study")
+    @PostMapping("/delete")
     public String deleteStudy(@RequestParam int studyId) {
         // 현재 로그인 된 유저 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -141,5 +139,6 @@ public class StudyController {
 
         return "redirect:/study";
     }
+
 
 }
