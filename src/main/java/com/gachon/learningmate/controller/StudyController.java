@@ -9,7 +9,6 @@ import com.gachon.learningmate.service.StudyServices;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -35,13 +34,12 @@ public class StudyController {
         this.studyRepository = studyRepository;
     }
 
-    // 스터디 생성 페이지 출력
+    // 스터디 생성 페이지
     @GetMapping("/create")
     public String showCreateStudy(Model model) {
-        // 현재 로그인 된 유저 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipalDetails userPrincipalDetails = (UserPrincipalDetails) authentication.getPrincipal();
+        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
 
+        // 유저 정보 전달
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
         model.addAttribute("email", userPrincipalDetails.getUserEamil());
         return "createStudy";
@@ -50,14 +48,24 @@ public class StudyController {
     // 스터디 생성
     @PostMapping("/create")
     public String createStudy(@RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
-        // 현재 로그인 된 유저 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipalDetails userPrincipalDetails = (UserPrincipalDetails) authentication.getPrincipal();
+        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
         studyDto.setCreatorId(userPrincipalDetails.getUser());
 
         // 사진 업로드 유효성 검사
         try {
             studyServices.validatePhoto(photo, studyDto);
+
+            // 스터디 DTO 필드 유효성 검사
+            if (result.hasErrors()) {
+                model.addAttribute("username", userPrincipalDetails.getUserRealName());
+                model.addAttribute("email", userPrincipalDetails.getUserEamil());
+                // 에러 메시지 저장
+                Map<String, String> validatorResult = studyServices.validateHandling(result);
+                for (String key : validatorResult.keySet()) {
+                    model.addAttribute(key, validatorResult.get(key));
+                }
+                return "createStudy";
+            }
 
         } catch (IOException e) {
             model.addAttribute("username", userPrincipalDetails.getUserRealName());
@@ -66,59 +74,38 @@ public class StudyController {
             return "createStudy";
         }
 
-        // 스터디 DTO 필드 유효성 검사
-        if (result.hasErrors()) {
-            model.addAttribute("username", userPrincipalDetails.getUserRealName());
-            model.addAttribute("email", userPrincipalDetails.getUserEamil());
-
-            Map<String, String> validatorResult = studyServices.validateHandling(result);
-            for (String key : validatorResult.keySet()) {
-                model.addAttribute(key, validatorResult.get(key));
-            }
-            return "createStudy";
-        }
-
         studyServices.createStudy(studyDto);
         return "study";
     }
 
-    // 스터디 목록 페이지 출력
+    // 스터디 목록
     @GetMapping
     public String showStudyList(Model model, @RequestParam(defaultValue = "1") int page) {
         // 한 페이지에 보여줄 아이템 수
         int pageSize = 12;
-        // PageRequest는 페이지 번호가 0부터 시작하므로, 사용자 입력에서 1을 빼줍니다.
-        // 하지만 페이지가 1 이하일 경우, 0으로 설정합니다.
         int pageIndex = (page < 1) ? 0 : page - 1;
         Page<Study> studyPage = studyServices.findAllStudy(PageRequest.of(pageIndex, pageSize));
 
-        // 현재 페이지의 스터디 목록
+        // 페이지 정보
         model.addAttribute("studies", studyPage.getContent());
-        // 현재 페이지 번호 (1부터 시작)
         model.addAttribute("currentPage", page);
-        // 전체 페이지 수
         model.addAttribute("totalPages", studyPage.getTotalPages());
-        // 다음 페이지가 있는지의 여부
         model.addAttribute("hasNext", studyPage.hasNext());
-        // 이전 페이지가 있는지의 여부
         model.addAttribute("hasPrevious", studyPage.hasPrevious());
-        // 다음 페이지 번호
         model.addAttribute("nextPage", page + 1);
-        // 이전 페이지 번호 (1보다 클 경우만 -1 적용)
         model.addAttribute("prevPage", (page > 1) ? page - 1 : 1);
 
         // 페이지 목록 생성
         List<PageItem> pages = PageItem.createPageItems(page, studyPage.getTotalPages());
         model.addAttribute("pages", pages);
 
-        return "study"; // 스터디 목록을 보여줄 뷰 이름
+        return "study";
     }
 
+    // 스터디 상세 정보
     @GetMapping("/info")
     public String showStudyInfo(Model model, @RequestParam int studyId) {
-        // 현재 로그인 된 유저 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserId = authentication.getName();
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Study study = studyRepository.findByStudyId(studyId);
 
@@ -128,11 +115,10 @@ public class StudyController {
         return "studyInfo";
     }
 
+    // 스터디 삭제
     @PostMapping("/delete")
     public String deleteStudy(@RequestParam int studyId) {
-        // 현재 로그인 된 유저 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipalDetails userPrincipalDetails = (UserPrincipalDetails) authentication.getPrincipal();
+        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
 
         Study study = studyRepository.findByStudyId(studyId);
         studyServices.deleteStudy(study, userPrincipalDetails);
@@ -140,12 +126,52 @@ public class StudyController {
         return "redirect:/study";
     }
 
+    // 스터디 수정 페이지
     @GetMapping("/update")
     public String showUpdateStudy(Model model, @RequestParam int studyId) {
         Study study = studyRepository.findByStudyId(studyId);
         StudyDto studyDto = studyServices.buildStudyDto(study);
 
         model.addAttribute("studyDto", studyDto);
-        return "studyUpdate";
+        System.out.println("studyDto.getPhotoPath() = " + studyDto.getPhotoPath());
+        return "updateStudy";
     }
+
+    // 스터디 수정
+    @PostMapping("/update")
+    public String updateStudy(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
+        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
+        studyDto.setCreatorId(userPrincipalDetails.getUser());
+        studyDto.setStudyId(studyId);
+
+        // 기존 photoPath를 설정
+        if (photo == null || photo.isEmpty()) {
+            Study existingStudy = studyRepository.findByStudyId(studyId);
+            studyDto.setPhotoPath(existingStudy.getPhotoPath());
+        } else {
+            // 사진 유효성 검사 및 업로드 처리
+            try {
+                studyServices.validatePhoto(photo, studyDto);
+            } catch (IOException e) {
+                model.addAttribute("error_photoPath", e.getMessage());
+                model.addAttribute("studyDto", studyDto);
+                return "updateStudy";
+            }
+        }
+
+        // DTO 유효성 검사
+        if (result.hasErrors()) {
+            model.addAttribute("studyDto", studyDto);
+            // 에러 메시지 저장
+            Map<String, String> validatorResult = studyServices.validateHandling(result);
+            for (String key : validatorResult.keySet()) {
+                model.addAttribute(key, validatorResult.get(key));
+            }
+            return "updateStudy";
+        }
+
+        studyServices.updateStudy(studyDto);
+        return "redirect:/study/info?studyId=" + studyDto.getStudyId();
+    }
+
 }
