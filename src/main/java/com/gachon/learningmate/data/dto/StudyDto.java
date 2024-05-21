@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 public class StudyDto {
 
-    private int id;
+    private int studyId;
 
     private User creatorId;
 
