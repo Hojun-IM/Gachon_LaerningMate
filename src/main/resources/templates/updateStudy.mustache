@@ -1,0 +1,88 @@
+{{>layouts/header}}
+
+<section class="h-100 h-custom">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-lg-8 col-xl-6">
+                <div class="card rounded-3">
+
+                    <form action="/study/update" method="post" enctype="multipart/form-data" class="px-md-2">
+                        <input type="hidden" name="studyId" value="{{#studyDto}}{{studyDto.studyId}}{{/studyDto}}">
+                        <input type="hidden" name="photoPath" value="{{#studyDto}}{{studyDto.photoPath}}{{/studyDto}}">
+
+                        <div class="form-group">
+                            <img id="imagePreview" src="{{#studyDto}}{{studyDto.photoPath}}{{/studyDto}}" class="img-fluid mb-3" alt="Image Preview" style="width: 100%; height: 260px; object-fit: cover;">
+                            <input type="file" class="form-control" id="file-upload" name="photo" onchange="previewFile()"/>
+                            <div class="text-danger mb-2" style="min-height: 8px;">{{#error_photoPath}}{{error_photoPath}}{{/error_photoPath}}</div>
+                        </div>
+
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2">스터디 정보 수정</h3>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="username" class="form-label">스터디장</label>
+                                <input type="text" class="form-control" name="username" value="{{#studyDto}}{{studyDto.creatorId.username}}{{/studyDto}}" disabled/>
+                            </div>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="email" class="form-label">스터디장 이메일</label>
+                                <input type="text" class="form-control" name="email" value="{{#studyDto}}{{studyDto.creatorId.email}}{{/studyDto}}" disabled/>
+                            </div>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="studyName" class="form-label">스터디명</label>
+                                <input type="text" class="form-control" name="studyName" value="{{#studyDto}}{{studyDto.studyName}}{{/studyDto}}"/>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div data-mdb-input-init class="form-outline datepicker">
+                                        <label for="maxMember" class="form-label">최대 인원</label>
+                                        <input type="text" class="form-control" name="maxMember" value="{{#studyDto}}{{studyDto.maxMember}}{{/studyDto}}"/>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <div data-mdb-input-init class="form-outline datepicker">
+                                        <label for="category" class="form-label">카테고리</label>
+                                        <input type="text" class="form-control" name="category" value="{{#studyDto}}{{studyDto.category}}{{/studyDto}}"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="location" class="form-label">활동 장소</label>
+                                <input type="text" class="form-control" name="location" value="{{#studyDto}}{{studyDto.location}}{{/studyDto}}"/>
+                            </div>
+
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <label for="description" class="form-label">스터디 소개</label>
+                                <textarea class="form-control" name="description">{{#studyDto}}{{studyDto.description}}{{/studyDto}}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-lg mb-1">수정 완료</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function previewFile() {
+        const preview = document.getElementById('imagePreview');
+        const file = document.getElementById('file-upload').files[0];
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "/images/default-study.jpg";
+        }
+    }
+</script>
+
+{{>layouts/footer}}
