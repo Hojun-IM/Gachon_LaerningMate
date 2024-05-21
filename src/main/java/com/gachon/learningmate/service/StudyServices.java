@@ -8,6 +8,8 @@ import com.gachon.learningmate.data.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,25 +49,47 @@ public class StudyServices {
 
     // 스터디 업데이트
     @Transactional
-    public Study updateStudy(StudyDto studyDto, Study study, UserPrincipalDetails currentUser) {
-        try {
-            validateStudyAndUser(study, currentUser);
-            // 변경 정보 업데이트
-            study = buildStudy(studyDto);
-            return studyRepository.save(study);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e.getMessage());
+    public void updateStudy(StudyDto studyDto) {
+        Study existingStudy = studyRepository.findByStudyId(studyDto.getStudyId());
+        UserPrincipalDetails principalDetails = getAuthentication();
+
+        // Validate the user and study
+        validateStudyAndUser(existingStudy, principalDetails);
+
+        // Update fields
+        if (studyDto.getStudyName() != null) {
+            existingStudy.setStudyName(studyDto.getStudyName());
         }
+        if (studyDto.getDescription() != null) {
+            existingStudy.setDescription(studyDto.getDescription());
+        }
+        if (studyDto.getStatus() != null) {
+            existingStudy.setStatus(studyDto.getStatus());
+        }
+        if (studyDto.getCategory() != null) {
+            existingStudy.setCategory(studyDto.getCategory());
+        }
+        if (studyDto.getLocation() != null) {
+            existingStudy.setLocation(studyDto.getLocation());
+        }
+        if (studyDto.getMaxMember() > 0) {
+            existingStudy.setMaxMember(studyDto.getMaxMember());
+        }
+        if (studyDto.getCurrentMember() > 0) {
+            existingStudy.setCurrentMember(studyDto.getCurrentMember());
+        }
+        if (studyDto.getPhotoPath() != null) {
+            existingStudy.setPhotoPath(studyDto.getPhotoPath());
+        }
+
+        // Save the updated entity
+        studyRepository.save(existingStudy);
     }
 
     // 스터디 삭제
     public void deleteStudy(Study study, UserPrincipalDetails currentUser) {
-        try {
-            validateStudyAndUser(study, currentUser);
-            studyRepository.delete(study);
-        } catch (RuntimeException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+        validateStudyAndUser(study, currentUser);
+        studyRepository.delete(study);
     }
 
     // 스터디 DTO에 설정된 유효성 검사
@@ -82,22 +106,18 @@ public class StudyServices {
 
     @Transactional
     public boolean validatePhoto(MultipartFile photo, StudyDto studyDto) throws IOException {
+        if (photo != null && !photo.isEmpty()) {
+            // 사진 파일 유효성 검사
+            if (!FileUploadUtil.isExtensionValid(photo)) {
+                throw new IOException("허용되는 파일 형식은 jpg, jpeg, png입니다.");
+            }
 
-        // 사진 파일 유효성 검사
-        if (!FileUploadUtil.isExtensionValid(photo)){
-            throw new IOException("허용되는 파일 형식은 jpg, jpeg, png입니다.");
+            // 파일 처리
+            String fileName = StringUtils.cleanPath(photo.getOriginalFilename());
+            FileUploadUtil.saveFile(uploadDir, fileName, photo);
+            studyDto.setPhotoPath("/img/study-logo/" + fileName);
         }
 
-        // 기본 사진 설정
-        if (photo == null || photo.isEmpty()) {
-            studyDto.setPhotoPath("/img/default-study.jpg");
-            return true;
-        }
-
-        // 파일 처리
-        String fileName = StringUtils.cleanPath(photo.getOriginalFilename());
-        FileUploadUtil.saveFile(uploadDir, fileName, photo);
-        studyDto.setPhotoPath("/img/study-logo/" + fileName);
         return true;
     }
 
@@ -119,6 +139,7 @@ public class StudyServices {
     // DB값 DTO로 가져오기
     public StudyDto buildStudyDto(Study study) {
         StudyDto studyDto = new StudyDto();
+        studyDto.setStudyId(study.getStudyId());
         studyDto.setCreatorId(study.getCreatorId());
         studyDto.setStudyName(study.getStudyName());
         studyDto.setDescription(study.getDescription());
@@ -141,10 +162,15 @@ public class StudyServices {
             throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
         }
 
-        if (!study.getCreatorId().equals(study.getCreatorId())) {
+        if (!study.getCreatorId().getUserId().equals(currentUser.getUser().getUserId())) {
             throw new IllegalStateException("스터디에 대한 권한이 없습니다.");
         }
         return true;
     }
 
+    // 로그인 된 사용자 정보 가져오기
+    public UserPrincipalDetails getAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (UserPrincipalDetails) authentication.getPrincipal();
+    }
 }
