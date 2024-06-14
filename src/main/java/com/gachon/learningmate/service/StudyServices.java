@@ -57,28 +57,14 @@ public class StudyServices {
         validateStudyAndUser(existingStudy, principalDetails);
 
         // Update fields
-        if (studyDto.getStudyName() != null) {
+        if (studyDto != null) {
             existingStudy.setStudyName(studyDto.getStudyName());
-        }
-        if (studyDto.getDescription() != null) {
             existingStudy.setDescription(studyDto.getDescription());
-        }
-        if (studyDto.getStatus() != null) {
             existingStudy.setStatus(studyDto.getStatus());
-        }
-        if (studyDto.getCategory() != null) {
             existingStudy.setCategory(studyDto.getCategory());
-        }
-        if (studyDto.getLocation() != null) {
             existingStudy.setLocation(studyDto.getLocation());
-        }
-        if (studyDto.getMaxMember() > 0) {
             existingStudy.setMaxMember(studyDto.getMaxMember());
-        }
-        if (studyDto.getCurrentMember() > 0) {
             existingStudy.setCurrentMember(studyDto.getCurrentMember());
-        }
-        if (studyDto.getPhotoPath() != null) {
             existingStudy.setPhotoPath(studyDto.getPhotoPath());
         }
 
