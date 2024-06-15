@@ -7,6 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StudyJoinRepository extends JpaRepository<StudyJoin, Long> {
-
-    public void save(StudyJoinDto studyJoinDto);
 }
