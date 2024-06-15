@@ -46,18 +46,15 @@ public class RegisterController {
     // 회원가입 정보 처리 및 검증
     @PostMapping("/register")
     public String processRegisterForm(@ModelAttribute("registerDto") @Valid RegisterDto registerDto, Errors errors, Model model, SessionStatus status, HttpSession session) {
-        // 세션에서 이메일 인증 여부 확인
-        Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
-
-        // 이메일 인증 미완료 시 오류 메시지를 추가
-        if (Boolean.FALSE.equals(emailVerified)) {
+        // 이메일 인증 여부 확인
+        if (!registerService.isEmailVerified(session)) {
             model.addAttribute("error_verification", "이메일 인증이 완료되지 않았습니다.");
             model.addAttribute("registerDto", registerDto);
             return "register";
         }
 
-        // 다른 필드에 대한 유효성 검사 오류 확인
-        if (errors.hasErrors() || Boolean.FALSE.equals(emailVerified)) {
+        // 유효성 검사 오류 확인
+        if (errors.hasErrors()) {
             model.addAttribute("registerDto", registerDto);
 
             Map<String, String> validatorResult = registerService.validateHandling(errors);
@@ -68,11 +65,11 @@ public class RegisterController {
         }
 
         try {
-            // 모든 검증을 통과한 경우 회원가입 로직 수행
+            // 회원가입 로직 수행
             registerService.register(registerDto);
             status.setComplete();
             session.removeAttribute("emailVerified");
-            return "/login";
+            return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("registerDto", registerDto);
             model.addAttribute("error_userId", e.getMessage());
@@ -100,16 +97,13 @@ public class RegisterController {
     public String checkVerificationCode(@RequestParam String verificationCode, Model model, @ModelAttribute("registerDto") RegisterDto registerDto, HttpSession session) {
         try {
             registerService.verifyCode(registerDto.getEmail(), verificationCode);
-            // 인증 성공 시 세션에 이메일 인증 상태를 저장
-            session.setAttribute("emailVerified", true);
+            registerService.completeEmailVerification(session);
             model.addAttribute("message_verification", "이메일 인증이 완료되었습니다.");
-            return "register";
         } catch (RuntimeException e) {
             model.addAttribute("error_verificationCode", e.getMessage());
-            // 인증 실패 시 세션에 인증 실패 상태를 저장
-            session.setAttribute("emailVerified", false);
-            return "register";
+            registerService.failEmailVerification(session);
         }
+        return "register";
     }
 
 }

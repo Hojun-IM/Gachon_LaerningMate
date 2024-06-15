@@ -3,6 +3,7 @@ package com.gachon.learningmate.service;
 import com.gachon.learningmate.data.dto.RegisterDto;
 import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,22 +35,18 @@ public class RegisterService {
     }
 
     // 회원가입
+    @Transactional
     public void register(RegisterDto registerDto) {
         try {
             // 아이디 중복 검사
             validateUserId(registerDto.getUserId());
 
-            // 패스워드 암호화 및 회원 정보 생성
+            // 패스워드 암호화
             String encryptedPassword = passwordEncoder.encode(registerDto.getPassword());
-            User newUser = User.builder()
-                    .userId(registerDto.getUserId())
-                    .password(encryptedPassword)
-                    .username(registerDto.getUsername())
-                    .email(registerDto.getEmail())
-                    .birth(parseDate(registerDto.getBirth()))
-                    .type(registerDto.getType())
-                    .build();
+            registerDto.setPassword(encryptedPassword);
 
+            // 회원 정보 생성 및 저장
+            User newUser = registerDto.toEntity();
             userRepository.save(newUser);
         } catch (RuntimeException e) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.", e);
@@ -66,17 +63,6 @@ public class RegisterService {
             validatorResult.put(errorKey, error.getDefaultMessage());
         }
         return validatorResult;
-    }
-
-    // 날짜 변환
-    private Date parseDate(String birth) {
-        // 문자열로 입력된 날짜를 Date 객체로 변환
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        try {
-            return dateFormat.parse(birth);
-        } catch (ParseException e) {
-            throw new RuntimeException("생년월일 형식이 올바르지 않습니다.");
-        }
     }
 
     // 이메일 인증 코드 생성
@@ -126,7 +112,7 @@ public class RegisterService {
     // 이메일 유효성 확인
     public void validateEmail(String email) {
         // 양식 확인
-        if (!email.matches("[\\w.-]+@gachon\\.ac\\.kr")){
+        if (!email.matches("[\\w.-]+@gachon\\.ac\\.kr")) {
             throw new RuntimeException("가천대학교 이메일을 사용해주세요.");
         }
 
@@ -142,6 +128,22 @@ public class RegisterService {
         if (userRepository.existsByUserId(userId)) {
             throw new RuntimeException("이미 사용 중인 아이디입니다.");
         }
+    }
+
+    // 이메일 인증 여부 확인
+    public boolean isEmailVerified(HttpSession session) {
+        Boolean emailVerified = (Boolean) session.getAttribute("emailVerified");
+        return emailVerified != null && emailVerified;
+    }
+
+    // 이메일 인증 완료 처리
+    public void completeEmailVerification(HttpSession session) {
+        session.setAttribute("emailVerified", true);
+    }
+
+    // 이메일 인증 실패 처리
+    public void failEmailVerification(HttpSession session) {
+        session.setAttribute("emailVerified", false);
     }
 
 }
