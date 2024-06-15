@@ -1,5 +1,6 @@
 package com.gachon.learningmate.data.dto;
 
+import com.gachon.learningmate.data.entity.Study;
 import com.gachon.learningmate.data.entity.StudyStatus;
 import com.gachon.learningmate.data.entity.User;
 import jakarta.validation.constraints.*;
@@ -47,17 +48,18 @@ public class StudyDto {
         return currentMember <= maxMember;
     }
 
-    @Override
-    public String toString() {
-        return "StudyDto{" +
-                "creatorId=" + creatorId +
-                ", studyName='" + studyName + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                ", category='" + category + '\'' +
-                ", location='" + location + '\'' +
-                ", maxMember=" + maxMember +
-                ", currentMember=" + currentMember +
-                '}';
+    public Study toEntity() {
+        Study study = new Study();
+        study.setStudyId(studyId);
+        study.setCreatorId(creatorId);
+        study.setStudyName(studyName);
+        study.setDescription(description);
+        study.setStatus(status);
+        study.setCategory(category);
+        study.setLocation(location);
+        study.setMaxMember(maxMember);
+        study.setCurrentMember(currentMember);
+        study.setPhotoPath(photoPath);
+        return study;
     }
 }

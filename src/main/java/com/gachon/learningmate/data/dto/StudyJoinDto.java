@@ -1,6 +1,7 @@
 package com.gachon.learningmate.data.dto;
 
 import com.gachon.learningmate.data.entity.Study;
+import com.gachon.learningmate.data.entity.StudyJoin;
 import com.gachon.learningmate.data.entity.StudyJoinRole;
 import com.gachon.learningmate.data.entity.User;
 import lombok.*;
@@ -25,4 +26,12 @@ public class StudyJoinDto {
     private String introduction;
 
     private StudyJoinRole role;
+
+    public StudyJoin toEntity() {
+        StudyJoin studyJoin = new StudyJoin();
+        studyJoin.setStudy(this.study);
+        studyJoin.setUser(this.user);
+        studyJoin.setIntroduction(this.introduction);
+        return studyJoin;
+    }
 }

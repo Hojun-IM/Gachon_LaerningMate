@@ -1,9 +1,14 @@
 package com.gachon.learningmate.data.dto;
 
+import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.entity.UserType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -37,4 +42,24 @@ public class RegisterDto {
 
     @Builder.Default
     private UserType type = UserType.Member;
+
+    public User toEntity() {
+        User user = new User();
+        user.setUserId(userId);
+        user.setPassword(password);
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setType(type);
+        user.setBirth(convertStringToDate(birth));
+        return user;
+    }
+
+    private Date convertStringToDate(String birth) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        try {
+            return dateFormat.parse(birth);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("생일은 yyyy/MM/dd 형식으로 입력해야 합니다.");
+        }
+    }
 }
