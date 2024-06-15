@@ -40,8 +40,6 @@ public class StudyController {
     @GetMapping("/create")
     public String showCreateStudy(Model model) {
         UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
-
-        // 유저 정보 전달
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
         model.addAttribute("email", userPrincipalDetails.getUserEamil());
         return "createStudy";
@@ -50,34 +48,21 @@ public class StudyController {
     // 스터디 생성
     @PostMapping("/create")
     public String createStudy(@RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
-        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
-        studyDto.setCreatorId(userPrincipalDetails.getUser());
-
-        // 사진 업로드 유효성 검사
         try {
-            studyServices.validatePhoto(photo, studyDto);
-
-            // 스터디 DTO 필드 유효성 검사
-            if (result.hasErrors()) {
-                model.addAttribute("username", userPrincipalDetails.getUserRealName());
-                model.addAttribute("email", userPrincipalDetails.getUserEamil());
-                // 에러 메시지 저장
-                Map<String, String> validatorResult = studyServices.validateHandling(result);
-                for (String key : validatorResult.keySet()) {
-                    model.addAttribute(key, validatorResult.get(key));
-                }
-                return "createStudy";
-            }
-
-        } catch (IOException e) {
+            studyServices.createStudy(studyDto, photo, result);
+        } catch (IOException | IllegalArgumentException e) {
+            UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
             model.addAttribute("username", userPrincipalDetails.getUserRealName());
             model.addAttribute("email", userPrincipalDetails.getUserEamil());
-            model.addAttribute("error_photoPath", e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            Map<String, String> validatorResult = studyServices.validateHandling(result);
+            for (String key : validatorResult.keySet()) {
+                model.addAttribute(key, validatorResult.get(key));
+            }
             return "createStudy";
         }
 
-        studyServices.createStudy(studyDto);
-        return "study";
+        return "redirect:/study";
     }
 
     // 스터디 목록
@@ -108,8 +93,7 @@ public class StudyController {
     @GetMapping("/info")
     public String showStudyInfo(Model model, @RequestParam int studyId) {
         String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        Study study = studyRepository.findByStudyId(studyId);
+        Study study = studyServices.findByStudyId(studyId);
 
         model.addAttribute("study", study);
         model.addAttribute("isCreator", study.getCreatorId().getUserId().equals(currentUserId));
@@ -120,51 +104,28 @@ public class StudyController {
     // 스터디 삭제
     @PostMapping("/delete")
     public String deleteStudy(@RequestParam int studyId) {
-        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
-
-        Study study = studyRepository.findByStudyId(studyId);
-        studyServices.deleteStudy(study, userPrincipalDetails);
-
+        studyServices.deleteStudy(studyId);
         return "redirect:/study";
     }
 
     // 스터디 수정 페이지
     @GetMapping("/update")
     public String showUpdateStudy(Model model, @RequestParam int studyId) {
-        Study study = studyRepository.findByStudyId(studyId);
+        Study study = studyServices.findByStudyId(studyId);
         StudyDto studyDto = studyServices.buildStudyDto(study);
 
         model.addAttribute("studyDto", studyDto);
-        System.out.println("studyDto.getPhotoPath() = " + studyDto.getPhotoPath());
         return "updateStudy";
     }
 
     // 스터디 수정
     @PostMapping("/update")
     public String updateStudy(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
-        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
-        studyDto.setCreatorId(userPrincipalDetails.getUser());
-        studyDto.setStudyId(studyId);
-
-        // 기존 photoPath를 설정
-        if (photo == null || photo.isEmpty()) {
-            Study existingStudy = studyRepository.findByStudyId(studyId);
-            studyDto.setPhotoPath(existingStudy.getPhotoPath());
-        } else {
-            // 사진 유효성 검사 및 업로드 처리
-            try {
-                studyServices.validatePhoto(photo, studyDto);
-            } catch (IOException e) {
-                model.addAttribute("error_photoPath", e.getMessage());
-                model.addAttribute("studyDto", studyDto);
-                return "updateStudy";
-            }
-        }
-
-        // DTO 유효성 검사
-        if (result.hasErrors()) {
-            model.addAttribute("studyDto", studyDto);
-            // 에러 메시지 저장
+        try {
+            studyDto.setStudyId(studyId);
+            studyServices.updateStudy(studyDto, photo, result);
+        } catch (IOException | IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
             Map<String, String> validatorResult = studyServices.validateHandling(result);
             for (String key : validatorResult.keySet()) {
                 model.addAttribute(key, validatorResult.get(key));
@@ -172,7 +133,6 @@ public class StudyController {
             return "updateStudy";
         }
 
-        studyServices.updateStudy(studyDto);
         return "redirect:/study/info?studyId=" + studyDto.getStudyId();
     }
 
@@ -183,12 +143,10 @@ public class StudyController {
         studyDto.setCreatorId(userPrincipalDetails.getUser());
         studyDto.setStudyId(studyId);
 
-        // 기존 photoPath를 설정
         if (photo == null || photo.isEmpty()) {
-            Study existingStudy = studyRepository.findByStudyId(studyId);
+            Study existingStudy = studyServices.findByStudyId(studyId);
             studyDto.setPhotoPath(existingStudy.getPhotoPath());
         } else {
-            // 사진 유효성 검사 및 업로드 처리
             try {
                 studyServices.validatePhoto(photo, studyDto);
             } catch (IOException e) {
@@ -198,26 +156,25 @@ public class StudyController {
             }
         }
 
+        model.addAttribute("studyId", studyId);
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
         model.addAttribute("email", userPrincipalDetails.getUserEamil());
 
         return "applyStudy";
     }
 
+    // 스터디 신청
     @PostMapping("/participate")
-    public String applyStudy(@Valid StudyJoinDto studyJoinDto, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()) {
+    public String applyStudy(@RequestParam int studyId, @Valid StudyJoinDto studyJoinDto, BindingResult bindingResult, Model model) {
+        try {
+            studyServices.applyStudy(studyId, studyJoinDto, bindingResult);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
             model.addAttribute("studyJoinDto", studyJoinDto);
             return "applyStudy";
         }
 
-        UserPrincipalDetails currentUser = studyServices.getAuthentication();
-        StudyDto studyDto = new StudyDto(); // Create and populate this DTO as needed
-        studyDto.setStudyId(studyJoinDto.getStudy().getStudyId()); // Set the correct studyId
-
-        studyServices.applyStudy(studyDto, studyJoinDto, currentUser);
-
-        return "redirect:/studies"; // 성공 시 리다이렉트할 페이지
+        return "redirect:/study";
     }
 
 }
