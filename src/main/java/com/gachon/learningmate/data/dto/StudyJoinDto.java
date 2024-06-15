@@ -32,6 +32,8 @@ public class StudyJoinDto {
         studyJoin.setStudy(this.study);
         studyJoin.setUser(this.user);
         studyJoin.setIntroduction(this.introduction);
+        studyJoin.setJoinDate(this.joinDate);
+        studyJoin.setRole(StudyJoinRole.MEMBER);
         return studyJoin;
     }
 }
