@@ -12,7 +12,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
 @Table(name = "study")
 public class Study {
 

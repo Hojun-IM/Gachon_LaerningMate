@@ -10,7 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Builder
+@Setter
 @Table(name = "study_join")
 public class StudyJoin {
 
@@ -26,6 +26,9 @@ public class StudyJoin {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column
+    private String introduction;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
