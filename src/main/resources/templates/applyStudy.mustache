@@ -17,7 +17,7 @@
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2">스터디 신청</h3>
 
                             <div data-mdb-input-init class="form-outline mb-4">
-                                <input type="text" class="form-control" name="username" value="{{#studyDto}}{{studyDto.creatorId.username}}{{/studyDto}}" disabled/>
+                                <input type="text" class="form-control" name="username" value="{{username}}" disabled/>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
@@ -25,7 +25,7 @@
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
-                                <textarea class="form-control" name="introduction" placeholder="자기 소개"></textarea>
+                                <textarea class="form-control" name="introduction" placeholder="자기 소개">{{#studyJoinDto}}{{introduction}}{{/studyJoinDto}}</textarea>
                                 <div class="text-danger" style="min-height: 8px;">{{#error_introduction}}{{error_introduction}}{{/error_introduction}}</div>
                             </div>
 

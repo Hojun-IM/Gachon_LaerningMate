@@ -2,8 +2,10 @@ package com.gachon.learningmate.controller;
 
 import com.gachon.learningmate.config.PageItem;
 import com.gachon.learningmate.data.dto.StudyDto;
+import com.gachon.learningmate.data.dto.StudyJoinDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
 import com.gachon.learningmate.data.entity.Study;
+import com.gachon.learningmate.data.repository.StudyJoinRepository;
 import com.gachon.learningmate.data.repository.StudyRepository;
 import com.gachon.learningmate.service.StudyServices;
 import jakarta.validation.Valid;
@@ -172,6 +174,50 @@ public class StudyController {
 
         studyServices.updateStudy(studyDto);
         return "redirect:/study/info?studyId=" + studyDto.getStudyId();
+    }
+
+    // 스터디 신청 폼
+    @GetMapping("/participate")
+    public String showApplyStudy(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, StudyDto studyDto, Model model) {
+        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
+        studyDto.setCreatorId(userPrincipalDetails.getUser());
+        studyDto.setStudyId(studyId);
+
+        // 기존 photoPath를 설정
+        if (photo == null || photo.isEmpty()) {
+            Study existingStudy = studyRepository.findByStudyId(studyId);
+            studyDto.setPhotoPath(existingStudy.getPhotoPath());
+        } else {
+            // 사진 유효성 검사 및 업로드 처리
+            try {
+                studyServices.validatePhoto(photo, studyDto);
+            } catch (IOException e) {
+                model.addAttribute("error_photoPath", e.getMessage());
+                model.addAttribute("studyDto", studyDto);
+                return "updateStudy";
+            }
+        }
+
+        model.addAttribute("username", userPrincipalDetails.getUserRealName());
+        model.addAttribute("email", userPrincipalDetails.getUserEamil());
+
+        return "applyStudy";
+    }
+
+    @PostMapping("/participate")
+    public String applyStudy(@Valid StudyJoinDto studyJoinDto, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("studyJoinDto", studyJoinDto);
+            return "applyStudy";
+        }
+
+        UserPrincipalDetails currentUser = studyServices.getAuthentication();
+        StudyDto studyDto = new StudyDto(); // Create and populate this DTO as needed
+        studyDto.setStudyId(studyJoinDto.getStudy().getStudyId()); // Set the correct studyId
+
+        studyServices.applyStudy(studyDto, studyJoinDto, currentUser);
+
+        return "redirect:/studies"; // 성공 시 리다이렉트할 페이지
     }
 
 }
