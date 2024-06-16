@@ -25,7 +25,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/study")
-public class StudyController {
+public class StudyController extends BaseController {
 
     private final StudyServices studyServices;
 
@@ -37,6 +37,7 @@ public class StudyController {
     // 스터디 생성 페이지
     @GetMapping("/create")
     public String showCreateStudy(Model model) {
+        addUserInfoToModel(model);
         UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
         model.addAttribute("email", userPrincipalDetails.getUserEamil());
@@ -46,6 +47,7 @@ public class StudyController {
     // 스터디 생성
     @PostMapping("/create")
     public String createStudy(@RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
+        addUserInfoToModel(model);
         try {
             studyServices.createStudy(studyDto, photo, result);
         } catch (IOException | IllegalArgumentException e) {
@@ -66,6 +68,8 @@ public class StudyController {
     // 스터디 목록
     @GetMapping
     public String showStudyList(Model model, @RequestParam(defaultValue = "1") int page) {
+        addUserInfoToModel(model);
+
         // 한 페이지에 보여줄 아이템 수
         int pageSize = 12;
         int pageIndex = (page < 1) ? 0 : page - 1;
@@ -90,6 +94,7 @@ public class StudyController {
     // 스터디 상세 정보
     @GetMapping("/info")
     public String showStudyInfo(Model model, @RequestParam int studyId) {
+        addUserInfoToModel(model);
         String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
         Study study = studyServices.findByStudyId(studyId);
 
@@ -101,7 +106,8 @@ public class StudyController {
 
     // 스터디 삭제
     @PostMapping("/delete")
-    public String deleteStudy(@RequestParam int studyId) {
+    public String deleteStudy(Model model, @RequestParam int studyId) {
+        addUserInfoToModel(model);
         studyServices.deleteStudy(studyId);
         return "redirect:/study";
     }
@@ -109,6 +115,7 @@ public class StudyController {
     // 스터디 수정 페이지
     @GetMapping("/update")
     public String showUpdateStudy(Model model, @RequestParam int studyId) {
+        addUserInfoToModel(model);
         Study study = studyServices.findByStudyId(studyId);
         StudyDto studyDto = studyServices.buildStudyDto(study);
 
@@ -119,6 +126,7 @@ public class StudyController {
     // 스터디 수정
     @PostMapping("/update")
     public String updateStudy(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
+        addUserInfoToModel(model);
         try {
             studyDto.setStudyId(studyId);
             studyServices.updateStudy(studyDto, photo, result);
@@ -137,6 +145,7 @@ public class StudyController {
     // 스터디 신청 폼
     @GetMapping("/participate")
     public String showApplyStudy(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, StudyDto studyDto, Model model) {
+        addUserInfoToModel(model);
         UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
         studyDto.setCreatorId(userPrincipalDetails.getUser());
         studyDto.setStudyId(studyId);
@@ -164,6 +173,7 @@ public class StudyController {
     // 스터디 신청
     @PostMapping("/participate")
     public String applyStudy(@RequestParam int studyId, @Valid StudyJoinDto studyJoinDto, BindingResult bindingResult, Model model) {
+        addUserInfoToModel(model);
         try {
             studyServices.applyStudy(studyId, studyJoinDto, bindingResult);
         } catch (IllegalArgumentException e) {
@@ -177,6 +187,7 @@ public class StudyController {
 
     @GetMapping("/apply/list")
     public String showApplyStudyList(Model model, @RequestParam int studyId) {
+        addUserInfoToModel(model);
         List<StudyJoinDto> studyJoinList = studyServices.getStudyJoinsByStudyId(studyId);
         model.addAttribute("studyJoinList", studyJoinList);
         return "applyStudyList";
