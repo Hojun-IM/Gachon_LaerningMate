@@ -28,12 +28,10 @@ import java.util.Map;
 public class StudyController {
 
     private final StudyServices studyServices;
-    private final StudyRepository studyRepository;
 
     @Autowired
-    public StudyController(StudyServices studyServices, StudyRepository studyRepository) {
+    public StudyController(StudyServices studyServices) {
         this.studyServices = studyServices;
-        this.studyRepository = studyRepository;
     }
 
     // 스터디 생성 페이지
@@ -175,6 +173,13 @@ public class StudyController {
         }
 
         return "redirect:/study";
+    }
+
+    @GetMapping("/apply/list")
+    public String showApplyStudyList(Model model, @RequestParam int studyId) {
+        List<StudyJoinDto> studyJoinList = studyServices.getStudyJoinsByStudyId(studyId);
+        model.addAttribute("studyJoinList", studyJoinList);
+        return "applyStudyList";
     }
 
 }

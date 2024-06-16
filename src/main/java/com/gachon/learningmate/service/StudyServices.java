@@ -11,6 +11,7 @@ import com.gachon.learningmate.data.repository.StudyJoinRepository;
 import com.gachon.learningmate.data.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StudyServices {
@@ -133,6 +135,21 @@ public class StudyServices {
         studyJoinRepository.save(studyJoin);
     }
 
+    // 스터디 신청 목록 가져오기
+    @Transactional(readOnly = true)
+    public List<StudyJoinDto> getStudyJoinsByStudyId(int studyId) {
+        List<StudyJoin> studyJoins = studyJoinRepository.findByStudy(studyRepository.findByStudyId(studyId));
+        return studyJoins.stream()
+                .map(studyJoin -> new StudyJoinDto(
+                        studyJoin.getJoinId(),
+                        studyJoin.getStudy(),
+                        studyJoin.getUser(),
+                        studyJoin.getJoinDate(),
+                        studyJoin.getIntroduction(),
+                        studyJoin.getRole()))
+                .collect(Collectors.toList());
+    }
+
     // 스터디 DTO에 설정된 유효성 검사
     @Transactional(readOnly = true)
     public Map<String, String> validateHandling(BindingResult result) {
@@ -194,11 +211,6 @@ public class StudyServices {
     public UserPrincipalDetails getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (UserPrincipalDetails) authentication.getPrincipal();
-    }
-
-    // 페이지네이션용 페이지 아이템 생성
-    public List<PageItem> createPageItems(int currentPage, int totalPages) {
-        return PageItem.createPageItems(currentPage, totalPages);
     }
 
     // 스터디 조회
