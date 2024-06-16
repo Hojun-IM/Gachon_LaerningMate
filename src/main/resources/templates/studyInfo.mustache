@@ -62,6 +62,7 @@
                                     <input type="hidden" name="studyId" value="{{#study}}{{study.studyId}}{{/study}}">
                                     <button type="submit" class="btn btn-danger btn-lg mb-1">스터디 삭제</button>
                                 </form>
+                                <a href="/study/apply/list?studyId={{#study}}{{study.studyId}}{{/study}}" class="btn btn-primary btn-lg mb-1">신청자 명단</a>
                             {{/isCreator}}
                             {{^isCreator}}
                                 <a href="/study/participate?studyId={{#study}}{{study.studyId}}{{/study}}" class="btn btn-success btn-lg mb-1">스터디 신청</a>
