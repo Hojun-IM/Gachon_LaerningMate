@@ -1,0 +1,57 @@
+{{>layouts/header}}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 mb-3 mb-lg-5">
+            <div class="overflow-hidden card table-nowrap table-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">스터디 신청자 명단</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="small text-uppercase bg-body text-muted">
+                        <tr>
+                            <th>이름</th>
+                            <th>이메일</th>
+                            <th>신청 날짜</th>
+                            <th>자기소개</th>
+                            <th> </th>
+                            <th class="text-end">자세히 보기</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#studyJoinList}}
+                        <tr class="align-middle">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <div class="h6 mb-0 lh-1">{{user.username}}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{user.email}}</td>
+                            <td>{{joinDate}}</td>
+                            <td>{{introduction}}</td>
+                            <td></td>
+                            <td class="text-end">
+                                <div class="dropdown">
+                                    <a data-bs-toggle="dropdown" href="#" class="btn p-1" aria-expanded="false">
+                                        <i class="fa fa-bars" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end" style="">
+                                        <a href="#!" class="dropdown-item">View Details</a>
+                                        <a href="#!" class="dropdown-item">Delete user</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/studyJoinList}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{>layouts/footer}}
