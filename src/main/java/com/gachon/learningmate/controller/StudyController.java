@@ -188,8 +188,13 @@ public class StudyController extends BaseController {
     @GetMapping("/apply/list")
     public String showApplyStudyList(Model model, @RequestParam int studyId) {
         addUserInfoToModel(model);
-        List<StudyJoinDto> studyJoinList = studyServices.getStudyJoinsByStudyId(studyId);
-        model.addAttribute("studyJoinList", studyJoinList);
+        try {
+            List<StudyJoinDto> studyJoinList = studyServices.getStudyJoinsByStudyId(studyId);
+            model.addAttribute("studyJoinList", studyJoinList);
+        } catch (IllegalAccessException e) {
+            model.addAttribute("error_apply", e.getMessage());
+            return "error";
+        }
         return "applyStudyList";
     }
 

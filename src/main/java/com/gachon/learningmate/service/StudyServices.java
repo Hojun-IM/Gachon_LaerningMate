@@ -137,7 +137,15 @@ public class StudyServices {
 
     // 스터디 신청 목록 가져오기
     @Transactional(readOnly = true)
-    public List<StudyJoinDto> getStudyJoinsByStudyId(int studyId) {
+    public List<StudyJoinDto> getStudyJoinsByStudyId(int studyId) throws IllegalAccessException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserId = authentication.getName();
+
+        Study study = studyRepository.findByStudyId(studyId);
+        if (!study.getCreatorId().getUserId().equals(currentUserId)) {
+            throw new IllegalAccessException("접근 권한이 없습니다.");
+        }
+
         List<StudyJoin> studyJoins = studyJoinRepository.findByStudy(studyRepository.findByStudyId(studyId));
         return studyJoins.stream()
                 .map(studyJoin -> new StudyJoinDto(
