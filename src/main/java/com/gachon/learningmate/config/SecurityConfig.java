@@ -14,15 +14,23 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String[] PUBLIC_MATCHERS = {
+            "/", "/home", "/register", "/login", "/register/send-verification", "/register/verify-code", "/study", "/study/create", "/study/info", "/study/participate", "/error"
+    };
+
+    private static final String[] STATIC_RESOURCES = {
+            "/css/**", "/js/**", "/img/**"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests((authrizeRequest) ->
-                        authrizeRequest
+                .authorizeHttpRequests((authorizeRequests) ->
+                        authorizeRequests
                                 // 로그인 없이 접근 허용
-                                .requestMatchers("/", "/home", "/register", "/login", "/register/send-verification", "/register/verify-code", "/study", "/study/create", "/study/info", "/study/participate").permitAll()
+                                .requestMatchers(PUBLIC_MATCHERS).permitAll()
                                 // 정적 파일 접근 허용
-                                .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
+                                .requestMatchers(STATIC_RESOURCES).permitAll()
                                 // 그 외 모든 요청은 인증 필요
                                 .anyRequest().authenticated()
                 )
