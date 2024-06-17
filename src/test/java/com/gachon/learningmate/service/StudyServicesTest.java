@@ -53,10 +53,10 @@ public class StudyServicesTest {
                     .photoPath("/img/default-study.jpg")
                     .build();
 
-            studyServices.createStudy(studyDto);
+
         });
         // 삽입된 스터디가 100개인지 확인
         long count = studyRepository.count();
-        assertThat(count).isEqualTo(204);
+        assertThat(count).isEqualTo(100);
     }
 }

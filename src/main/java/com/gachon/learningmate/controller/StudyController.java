@@ -174,6 +174,12 @@ public class StudyController extends BaseController {
     @PostMapping("/participate")
     public String applyStudy(@RequestParam int studyId, @Valid StudyJoinDto studyJoinDto, BindingResult bindingResult, Model model) {
         addUserInfoToModel(model);
+
+        model.addAttribute("studyId", studyId);
+        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
+        model.addAttribute("username", userPrincipalDetails.getUserRealName());
+        model.addAttribute("email", userPrincipalDetails.getUserEamil());
+
         try {
             studyServices.applyStudy(studyId, studyJoinDto, bindingResult);
         } catch (IllegalArgumentException e) {
@@ -185,6 +191,7 @@ public class StudyController extends BaseController {
         return "redirect:/study";
     }
 
+    // 스터디 신청 목록
     @GetMapping("/apply/list")
     public String showApplyStudyList(Model model, @RequestParam int studyId) {
         addUserInfoToModel(model);
@@ -198,4 +205,29 @@ public class StudyController extends BaseController {
         return "applyStudyList";
     }
 
+    // 스터디 신청 승인
+    @PostMapping("/apply/accept")
+    public String acceptStudyJoin(@RequestParam long joinId, @RequestParam int studyId, Model model) {
+        addUserInfoToModel(model);
+        try {
+            studyServices.acceptStudyJoin(joinId);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error_apply", e.getMessage());
+            return "redirect:/study/apply/list?studyId=" + studyId;
+        }
+        return "redirect:/study/apply/list?studyId=" + studyId;
+    }
+
+    // 스터디 신청 거절
+    @PostMapping("/apply/reject")
+    public String rejectStudyJoin(@RequestParam long joinId, @RequestParam int studyId, Model model) {
+        addUserInfoToModel(model);
+        try {
+            studyServices.rejectStudyJoin(joinId);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error_apply", e.getMessage());
+            return "redirect:/study/apply/list?studyId=" + studyId;
+        }
+        return "redirect:/study/apply/list?studyId=" + studyId;
+    }
 }
