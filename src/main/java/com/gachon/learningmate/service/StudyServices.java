@@ -7,7 +7,10 @@ import com.gachon.learningmate.data.dto.StudyJoinDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
 import com.gachon.learningmate.data.entity.Study;
 import com.gachon.learningmate.data.entity.StudyJoin;
+import com.gachon.learningmate.data.entity.StudyJoinRole;
+import com.gachon.learningmate.data.entity.StudyMember;
 import com.gachon.learningmate.data.repository.StudyJoinRepository;
+import com.gachon.learningmate.data.repository.StudyMemberRepository;
 import com.gachon.learningmate.data.repository.StudyRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -39,11 +42,13 @@ public class StudyServices {
 
     private final StudyRepository studyRepository;
     private final StudyJoinRepository studyJoinRepository;
+    private final StudyMemberRepository studyMemberRepository;
 
     @Autowired
-    public StudyServices(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository) {
+    public StudyServices(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository, StudyMemberRepository studyMemberRepository) {
         this.studyRepository = studyRepository;
         this.studyJoinRepository = studyJoinRepository;
+        this.studyMemberRepository = studyMemberRepository;
     }
 
     // 스터디 조회
@@ -70,6 +75,15 @@ public class StudyServices {
 
         Study study = studyDto.toEntity();
         studyRepository.save(study);
+
+        // 스터디 생성자를 StudyMember로 추가
+        StudyMember leader = new StudyMember();
+        leader.setStudy(study);
+        leader.setUser(userPrincipalDetails.getUser());
+        leader.setJoinDate(new Date());
+        leader.setRole(StudyJoinRole.LEADER);
+
+        studyMemberRepository.save(leader);
     }
 
     // 스터디 업데이트
@@ -109,14 +123,42 @@ public class StudyServices {
         Study study = studyRepository.findByStudyId(studyId);
         UserPrincipalDetails currentUser = getAuthentication();
         validateStudyAndUser(study, currentUser);
+
+        // 관련 StudyMember 삭제
+        List<StudyMember> studyMembers = studyMemberRepository.findByStudy(study);
+        studyMemberRepository.deleteAll(studyMembers);
+
         studyRepository.delete(study);
+    }
+
+    // 스터디 신청 목록 가져오기
+    @Transactional(readOnly = true)
+    public List<StudyJoinDto> getStudyJoinsByStudyId(int studyId) throws IllegalAccessException {
+        UserPrincipalDetails currentUser = getAuthentication();
+        String currentUserId = currentUser.getUsername();
+
+        Study study = studyRepository.findByStudyId(studyId);
+        if (!study.getCreatorId().getUserId().equals(currentUserId)) {
+            throw new IllegalAccessException("접근 권한이 없습니다.");
+        }
+
+        List<StudyJoin> studyJoins = studyJoinRepository.findByStudy(studyRepository.findByStudyId(studyId));
+        return studyJoins.stream()
+                .map(studyJoin -> new StudyJoinDto(
+                        studyJoin.getJoinId(),
+                        studyJoin.getStudy(),
+                        studyJoin.getUser(),
+                        studyJoin.getJoinDate(),
+                        studyJoin.getIntroduction(),
+                        studyJoin.getRole()))
+                .collect(Collectors.toList());
     }
 
     // 스터디 신청
     @Transactional
     public void applyStudy(int studyId, StudyJoinDto studyJoinDto, BindingResult result) {
         if (result.hasErrors()) {
-            throw new IllegalArgumentException("스터디 참여 DTO 필드 유효성 검사 오류");
+            throw new IllegalArgumentException("자기소개는 최소 10글자 이상이어야 합니다.");
         }
 
         UserPrincipalDetails currentUser = getAuthentication();
@@ -135,27 +177,38 @@ public class StudyServices {
         studyJoinRepository.save(studyJoin);
     }
 
-    // 스터디 신청 목록 가져오기
-    @Transactional(readOnly = true)
-    public List<StudyJoinDto> getStudyJoinsByStudyId(int studyId) throws IllegalAccessException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserId = authentication.getName();
+    // 스터디 신청 승인
+    @Transactional
+    public void acceptStudyJoin(Long joinId) {
+        StudyJoin studyJoin = studyJoinRepository.findById(joinId)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 신청 ID입니다."));
 
-        Study study = studyRepository.findByStudyId(studyId);
-        if (!study.getCreatorId().getUserId().equals(currentUserId)) {
-            throw new IllegalAccessException("접근 권한이 없습니다.");
+        Study study = studyJoin.getStudy();
+        if (study.getCurrentMember() >= study.getMaxMember()) {
+            throw new IllegalStateException("이미 스터디의 최대 정원입니다.");
         }
 
-        List<StudyJoin> studyJoins = studyJoinRepository.findByStudy(studyRepository.findByStudyId(studyId));
-        return studyJoins.stream()
-                .map(studyJoin -> new StudyJoinDto(
-                        studyJoin.getJoinId(),
-                        studyJoin.getStudy(),
-                        studyJoin.getUser(),
-                        studyJoin.getJoinDate(),
-                        studyJoin.getIntroduction(),
-                        studyJoin.getRole()))
-                .collect(Collectors.toList());
+        StudyMember studyMember = new StudyMember();
+        studyMember.setStudy(studyJoin.getStudy());
+        studyMember.setUser(studyJoin.getUser());
+        studyMember.setJoinDate(new Date());
+        studyMember.setRole(studyJoin.getRole());
+
+        studyMemberRepository.save(studyMember);
+        studyJoinRepository.delete(studyJoin);
+
+        // 현재 멤버 수 증가
+        study.setCurrentMember(study.getCurrentMember() + 1);
+        studyRepository.save(study);
+    }
+
+    // 스터디 신청 거절
+    @Transactional
+    public void rejectStudyJoin(Long joinId) {
+        StudyJoin studyJoin = studyJoinRepository.findById(joinId)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 신청 ID입니다."));
+
+        studyJoinRepository.delete(studyJoin);
     }
 
     // 스터디 DTO에 설정된 유효성 검사
