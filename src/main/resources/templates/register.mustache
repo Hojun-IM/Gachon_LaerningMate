@@ -10,7 +10,7 @@
                         <p class="text-white-50 mb-5">이메일 인증 및 회원 정보를 입력하세요.</p>
 
                         <!-- 인증 코드 전송 -->
-                        <form action="/register/send-verification" method="post" modelAttribute="registerDto">
+                        <form action="/register/send-verification" method="post">
                             <div class="form-outline form-white mb-3 d-flex align-items-center">
                                 <input type="text" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" placeholder="EMAIL" class="form-control form-control-lg flex-grow-1 me-2" />
                                 <button type="submit" class="btn btn-outline-light btn-sm" />인증 코드 전송</button>
@@ -20,7 +20,7 @@
                         </form>
 
                         <!-- 인증 코드 검증 -->
-                        <form action="/register/verify-code" method="post" modelAttribute="registerDto">
+                        <form action="/register/verify-code" method="post">
                             <input type="hidden" name="email" value="{{#registerDto}}{{registerDto.email}}{{/registerDto}}" />
                             <div class="form-outline form-white mb-3 d-flex align-items-center">
                                 <input type="text" name="verificationCode" value="{{#registerDto}}{{registerDto.verificationCode}}{{/registerDto}}" placeholder="Verification Code" class="form-control form-control-lg flex-grow-1 me-2" />
