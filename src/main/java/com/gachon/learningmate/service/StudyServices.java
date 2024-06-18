@@ -1,20 +1,16 @@
 package com.gachon.learningmate.service;
 
 import com.gachon.learningmate.config.FileUploadUtil;
-import com.gachon.learningmate.config.PageItem;
 import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.dto.StudyJoinDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
-import com.gachon.learningmate.data.entity.Study;
-import com.gachon.learningmate.data.entity.StudyJoin;
-import com.gachon.learningmate.data.entity.StudyJoinRole;
-import com.gachon.learningmate.data.entity.StudyMember;
+import com.gachon.learningmate.data.entity.*;
 import com.gachon.learningmate.data.repository.StudyJoinRepository;
 import com.gachon.learningmate.data.repository.StudyMemberRepository;
 import com.gachon.learningmate.data.repository.StudyRepository;
+import com.gachon.learningmate.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,22 +47,17 @@ public class StudyServices {
         this.studyMemberRepository = studyMemberRepository;
     }
 
-    // 스터디 조회
+    // 전체 스터디 조회
     public Page<Study> findAllStudy(Pageable pageable) {
         return studyRepository.findAll(pageable);
     }
 
     // 스터디 생성
     @Transactional
-    public void createStudy(StudyDto studyDto, MultipartFile photo, BindingResult result) throws IOException {
+    public void createStudy(StudyDto studyDto, MultipartFile photo) throws IOException {
         UserPrincipalDetails userPrincipalDetails = getAuthentication();
         studyDto.setCreatorId(userPrincipalDetails.getUser());
-
         validatePhoto(photo, studyDto);
-
-        if (result.hasErrors()) {
-            throw new IllegalArgumentException("스터디 DTO 필드 유효성 검사 오류");
-        }
 
         // 기본 사진 경로 설정
         if (studyDto.getPhotoPath() == null || studyDto.getPhotoPath().isEmpty()) {
@@ -82,17 +73,14 @@ public class StudyServices {
         leader.setUser(userPrincipalDetails.getUser());
         leader.setJoinDate(new Date());
         leader.setRole(StudyJoinRole.LEADER);
-
         studyMemberRepository.save(leader);
     }
 
     // 스터디 업데이트
     @Transactional
-    public void updateStudy(StudyDto studyDto, MultipartFile photo, BindingResult result) throws IOException {
+    public void updateStudy(StudyDto studyDto, MultipartFile photo) throws IOException {
         Study existingStudy = studyRepository.findByStudyId(studyDto.getStudyId());
         UserPrincipalDetails principalDetails = getAuthentication();
-
-        // Validate the user and study
         validateStudyAndUser(existingStudy, principalDetails);
 
         if (photo != null && !photo.isEmpty()) {
@@ -101,19 +89,7 @@ public class StudyServices {
             studyDto.setPhotoPath(existingStudy.getPhotoPath());
         }
 
-        if (result.hasErrors()) {
-            throw new IllegalArgumentException("스터디 DTO 필드 유효성 검사 오류");
-        }
-
-        existingStudy.setStudyName(studyDto.getStudyName());
-        existingStudy.setDescription(studyDto.getDescription());
-        existingStudy.setStatus(studyDto.getStatus());
-        existingStudy.setCategory(studyDto.getCategory());
-        existingStudy.setLocation(studyDto.getLocation());
-        existingStudy.setMaxMember(studyDto.getMaxMember());
-        existingStudy.setCurrentMember(studyDto.getCurrentMember());
-        existingStudy.setPhotoPath(studyDto.getPhotoPath());
-
+        existingStudy.updateFromDto(studyDto);
         studyRepository.save(existingStudy);
     }
 
@@ -124,16 +100,14 @@ public class StudyServices {
         UserPrincipalDetails currentUser = getAuthentication();
         validateStudyAndUser(study, currentUser);
 
-        // 관련 StudyMember 삭제
         List<StudyMember> studyMembers = studyMemberRepository.findByStudy(study);
         studyMemberRepository.deleteAll(studyMembers);
-
         studyRepository.delete(study);
     }
 
     // 스터디 신청 목록 가져오기
     @Transactional(readOnly = true)
-    public List<StudyJoinDto> getStudyJoinsByStudyId(int studyId) throws IllegalAccessException {
+    public List<StudyJoinDto> getStudyJoinByStudyId(int studyId) throws IllegalAccessException {
         UserPrincipalDetails currentUser = getAuthentication();
         String currentUserId = currentUser.getUsername();
 
@@ -222,10 +196,8 @@ public class StudyServices {
     }
 
     // 스터디 DTO에 설정된 유효성 검사
-    @Transactional(readOnly = true)
     public Map<String, String> validateHandling(BindingResult result) {
         Map<String, String> validatorResult = new HashMap<>();
-        // 유효성 검사 실패한 필드 목록 받아오기
         for (FieldError error : result.getFieldErrors()) {
             String errorKey = String.format("error_%s", error.getField());
             validatorResult.put(errorKey, error.getDefaultMessage());
@@ -270,7 +242,7 @@ public class StudyServices {
         }
 
         if (currentUser == null) {
-            throw new IllegalArgumentException("회원을 찾을 수 없습니다.");
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
         }
 
         if (!study.getCreatorId().getUserId().equals(currentUser.getUser().getUserId())) {
