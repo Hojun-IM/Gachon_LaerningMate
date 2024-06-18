@@ -173,6 +173,11 @@ public class StudyServices {
             throw new IllegalArgumentException("이미 신청되었습니다.");
         }
 
+        // 이미 스터디의 멤버인지 확인
+        if (studyMemberRepository.findByStudyAndUser(study, currentUser.getUser()).isPresent()) {
+            throw new IllegalArgumentException("이미 가입된 스터디입니다.");
+        }
+
         studyJoinDto.setStudy(study);
         studyJoinDto.setUser(currentUser.getUser());
         studyJoinDto.setJoinDate(new Date());
