@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.gachon.learningmate.data.dto.StudyDto;
 
 import java.util.Date;
 
@@ -59,7 +60,17 @@ public class Study {
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
-    // 사진 경로
     @Column(nullable = false)
     private String photoPath;
+
+    public void updateFromDto(StudyDto studyDto) {
+        this.studyName = studyDto.getStudyName();
+        this.description = studyDto.getDescription();
+        this.status = studyDto.getStatus();
+        this.category = studyDto.getCategory();
+        this.location = studyDto.getLocation();
+        this.maxMember = studyDto.getMaxMember();
+        this.currentMember = studyDto.getCurrentMember();
+        this.photoPath = studyDto.getPhotoPath();
+    }
 }
