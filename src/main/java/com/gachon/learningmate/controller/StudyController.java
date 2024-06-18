@@ -183,7 +183,7 @@ public class StudyController extends BaseController {
         try {
             studyServices.applyStudy(studyId, studyJoinDto, bindingResult);
         } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("error_apply", e.getMessage());
             model.addAttribute("studyJoinDto", studyJoinDto);
             return "applyStudy";
         }
@@ -200,7 +200,7 @@ public class StudyController extends BaseController {
             model.addAttribute("studyJoinList", studyJoinList);
         } catch (IllegalAccessException e) {
             model.addAttribute("error_apply", e.getMessage());
-            return "error";
+            return "applyStudyList";
         }
         return "applyStudyList";
     }

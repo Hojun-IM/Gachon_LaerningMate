@@ -168,6 +168,11 @@ public class StudyServices {
             throw new IllegalArgumentException("해당 스터디를 찾을 수 없습니다.");
         }
 
+        // 신청이 이미 존재하는지 확인
+        if (studyJoinRepository.findByStudyAndUser(study, currentUser.getUser()).isPresent()) {
+            throw new IllegalArgumentException("이미 신청되었습니다.");
+        }
+
         studyJoinDto.setStudy(study);
         studyJoinDto.setUser(currentUser.getUser());
         studyJoinDto.setJoinDate(new Date());
