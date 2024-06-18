@@ -3,6 +3,8 @@ package com.gachon.learningmate.service;
 import com.gachon.learningmate.data.dto.RegisterDto;
 import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.UserRepository;
+import com.gachon.learningmate.exception.DuplicateEmailException;
+import com.gachon.learningmate.exception.DuplicateUserIdException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,47 +39,15 @@ public class RegisterService {
     // 회원가입
     @Transactional
     public void register(RegisterDto registerDto) {
-        try {
-            // 아이디 중복 검사
-            validateUserId(registerDto.getUserId());
+        validateUserId(registerDto.getUserId());
 
-            // 패스워드 암호화
-            String encryptedPassword = passwordEncoder.encode(registerDto.getPassword());
-            registerDto.setPassword(encryptedPassword);
+        // 패스워드 암호화
+        String encryptedPassword = passwordEncoder.encode(registerDto.getPassword());
+        registerDto.setPassword(encryptedPassword);
 
-            // 회원 정보 생성 및 저장
-            User newUser = registerDto.toEntity();
-            userRepository.save(newUser);
-        } catch (RuntimeException e) {
-            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.", e);
-        }
-    }
-
-    // 회원가입 DTO에 설정된 유효성 검사
-    @Transactional(readOnly = true)
-    public Map<String, String> validateHandling(Errors errors) {
-        Map<String, String> validatorResult = new HashMap<>();
-        // 유효성 검사 실패한 필드 목록 받아오기
-        for (FieldError error : errors.getFieldErrors()) {
-            String errorKey = String.format("error_%s", error.getField());
-            validatorResult.put(errorKey, error.getDefaultMessage());
-        }
-        return validatorResult;
-    }
-
-    // 이메일 인증 코드 생성
-    public String createVerificationCode() {
-        int length = 6;
-        try {
-            Random random = SecureRandom.getInstanceStrong();
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < length; i++) {
-                builder.append(random.nextInt(10));
-            }
-            return builder.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("인증코드 생성에 실패했습니다.");
-        }
+        // 회원 정보 생성 및 저장
+        User newUser = registerDto.toEntity();
+        userRepository.save(newUser);
     }
 
     // 인증 코드 전송
@@ -85,6 +55,7 @@ public class RegisterService {
     public void sendVerificationCode(String email) {
         // 이메일 유효성 검사
         validateEmail(email);
+        validateEmailFormat(email);
 
         // 인증 코드 생성
         String verificationCode = createVerificationCode();
@@ -109,24 +80,49 @@ public class RegisterService {
         redisService.deleteValues(email);
     }
 
+    // 이메일 인증 코드 생성
+    public String createVerificationCode() {
+        int length = 6;
+        try {
+            Random random = SecureRandom.getInstanceStrong();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                builder.append(random.nextInt(10));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("인증코드 생성에 실패했습니다.");
+        }
+    }
+
+    // DTO에 설정된 유효성 검사
+    public Map<String, String> validateHandling(Errors errors) {
+        Map<String, String> validatorResult = new HashMap<>();
+        for (FieldError error : errors.getFieldErrors()) {
+            String errorKey = String.format("error_%s", error.getField());
+            validatorResult.put(errorKey, error.getDefaultMessage());
+        }
+        return validatorResult;
+    }
+
     // 이메일 유효성 확인
     public void validateEmail(String email) {
-        // 양식 확인
-        if (!email.matches("[\\w.-]+@gachon\\.ac\\.kr")) {
-            throw new RuntimeException("가천대학교 이메일을 사용해주세요.");
-        }
-
-        // 중복 확인
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("중복된 이메일 주소입니다.");
+            throw new DuplicateEmailException("중복된 이메일 주소입니다.");
+        }
+    }
+
+    // 이메일 유효성 확인
+    public void validateEmailFormat(String email) {
+        if (!email.matches("[\\w.-]+@gachon\\.ac\\.kr")) {
+            throw new IllegalArgumentException("가천대학교 이메일을 사용해주세요.");
         }
     }
 
     // 아이디 유효성 확인
     private void validateUserId(String userId) {
-        // 아이디 중복 확인
         if (userRepository.existsByUserId(userId)) {
-            throw new RuntimeException("이미 사용 중인 아이디입니다.");
+            throw new DuplicateUserIdException("이미 사용 중인 아이디입니다.");
         }
     }
 

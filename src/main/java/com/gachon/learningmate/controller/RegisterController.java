@@ -27,14 +27,7 @@ public class RegisterController {
     // 초기화된 회원가입 데이터 객체 생성
     @ModelAttribute("registerDto")
     public RegisterDto registerDto() {
-        return RegisterDto.builder()
-                .userId("")
-                .password("")
-                .username("")
-                .email("")
-                .birth("")
-                .verificationCode("")
-                .build();
+        return RegisterDto.builder().build();
     }
 
     // 회원가입 페이지 출력
@@ -56,7 +49,6 @@ public class RegisterController {
         // 유효성 검사 오류 확인
         if (errors.hasErrors()) {
             model.addAttribute("registerDto", registerDto);
-
             Map<String, String> validatorResult = registerService.validateHandling(errors);
             for (String key : validatorResult.keySet()) {
                 model.addAttribute(key, validatorResult.get(key));
@@ -79,10 +71,10 @@ public class RegisterController {
 
     // 회원가입 인증 코드 전송
     @PostMapping("/register/send-verification")
-    public String sendVerificationEmail(@RequestParam String email, Model model, @ModelAttribute("registerDto") RegisterDto registerDto) {
+    public String sendVerificationEmail(@RequestParam String email, @ModelAttribute("registerDto") RegisterDto registerDto, Model model) {
         try {
             registerService.sendVerificationCode(email);
-            // 세션 registerDto에 이메일 정보 저장
+            // 세션에 이메일 정보 저장
             registerDto.setEmail(email);
             model.addAttribute("registerDto", registerDto);
             model.addAttribute("message_email", "인증 코드가 이메일로 전송되었습니다.");
@@ -94,7 +86,7 @@ public class RegisterController {
 
     // 회원가입 인증 코드 확인
     @PostMapping("/register/verify-code")
-    public String checkVerificationCode(@RequestParam String verificationCode, Model model, @ModelAttribute("registerDto") RegisterDto registerDto, HttpSession session) {
+    public String checkVerificationCode(@RequestParam String verificationCode, @ModelAttribute("registerDto") RegisterDto registerDto, Model model, HttpSession session) {
         try {
             registerService.verifyCode(registerDto.getEmail(), verificationCode);
             registerService.completeEmailVerification(session);
