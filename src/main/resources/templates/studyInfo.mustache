@@ -55,6 +55,11 @@
                                 <label for="description" class="form-label">스터디 소개</label>
                                 <textarea class="form-control" name="description" placeholder="스터디 설명" disabled>{{#study}}{{study.description}}{{/study}}</textarea>
                             </div>
+
+                            {{#error_apply}}
+                                <div class="alert alert-danger">{{error_apply}}</div>
+                            {{/error_apply}}
+
                             {{#isCreator}}
                                 <a href="/study/update?studyId={{#study}}{{study.studyId}}{{/study}}" class="btn btn-primary btn-lg mb-1">스터디 수정</a>
                                 <form action="/study/delete" method="post" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
@@ -65,7 +70,7 @@
                                 <a href="/study/apply/list?studyId={{#study}}{{study.studyId}}{{/study}}" class="btn btn-primary btn-lg mb-1">신청자 명단</a>
                             {{/isCreator}}
                             {{^isCreator}}
-                                <a href="/study/participate?studyId={{#study}}{{study.studyId}}{{/study}}" class="btn btn-success btn-lg mb-1">스터디 신청</a>
+                                <a href="/study/apply?studyId={{#study}}{{study.studyId}}{{/study}}" class="btn btn-success btn-lg mb-1">스터디 신청</a>
                             {{/isCreator}}
                         </div>
                     </div>
