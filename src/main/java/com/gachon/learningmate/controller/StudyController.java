@@ -87,11 +87,38 @@ public class StudyController extends BaseController {
         return "study";
     }
 
+    // 내 스터디 목록
+    @GetMapping("/my")
+    public String showMyStudy(@RequestParam(defaultValue = "1") int page, Model model) {
+        addUserInfoToModel(model);
+        String userId = studyServices.getAuthentication().getUsername();
+
+        // 한 페이지에 보여줄 아이템 수
+        int pageSize = 12;
+        int pageIndex = Math.max(page - 1, 0);
+        Page<Study> studyPage = studyServices.findStudyByUserId(userId, PageRequest.of(pageIndex, pageSize));
+
+        // 페이지 정보
+        model.addAttribute("studies", studyPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", studyPage.getTotalPages());
+        model.addAttribute("hasNext", studyPage.hasNext());
+        model.addAttribute("hasPrevious", studyPage.hasPrevious());
+        model.addAttribute("nextPage", page + 1);
+        model.addAttribute("prevPage", (page > 1) ? page - 1 : 1);
+
+        // 페이지 목록 생성
+        List<PageItem> pages = PageItem.createPageItems(page, studyPage.getTotalPages());
+        model.addAttribute("pages", pages);
+
+        return "study";
+    }
+
     // 스터디 상세 정보
     @GetMapping("/info")
     public String showStudyInfo(@RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
-        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUserId = studyServices.getAuthentication().getUsername();
         Study study = studyServices.findByStudyId(studyId);
 
         model.addAttribute("study", study);
@@ -178,7 +205,7 @@ public class StudyController extends BaseController {
         } catch (IllegalArgumentException e) {
             model.addAttribute("error_apply", e.getMessage());
             model.addAttribute("studyJoinDto", studyJoinDto);
-            return "applyStudy";
+            return "redirect:/apply";
         }
 
         return "redirect:/study";

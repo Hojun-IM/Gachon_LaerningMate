@@ -39,17 +39,25 @@ public class StudyServices {
     private final StudyRepository studyRepository;
     private final StudyJoinRepository studyJoinRepository;
     private final StudyMemberRepository studyMemberRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public StudyServices(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository, StudyMemberRepository studyMemberRepository) {
+    public StudyServices(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository, StudyMemberRepository studyMemberRepository, UserRepository userRepository) {
         this.studyRepository = studyRepository;
         this.studyJoinRepository = studyJoinRepository;
         this.studyMemberRepository = studyMemberRepository;
+        this.userRepository = userRepository;
     }
 
     // 전체 스터디 조회
     public Page<Study> findAllStudy(Pageable pageable) {
         return studyRepository.findAll(pageable);
+    }
+
+    // 내 스터디 조회
+    public Page<Study> findStudyByUserId(String userId, Pageable pageable) {
+        User user = userRepository.findByUserId(userId);
+        return studyRepository.findStudyByCreatorId(user, pageable);
     }
 
     // 스터디 생성
