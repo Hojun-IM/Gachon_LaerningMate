@@ -11,6 +11,7 @@ import com.gachon.learningmate.data.repository.StudyRepository;
 import com.gachon.learningmate.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,6 +59,13 @@ public class StudyService {
     public Page<Study> findStudyByUserId(String userId, Pageable pageable) {
         User user = userRepository.findByUserId(userId);
         return studyRepository.findStudyByCreatorId(user, pageable);
+    }
+
+    // 최근 등록된 스터디 조회
+    public List<Study> findRecentStudy(int limit) {
+        PageRequest pageRequest = PageRequest.of(0, limit);
+        List<Study> recentStudies = studyRepository.findAllByOrderByCreatedAtDesc(pageRequest).getContent();
+        return recentStudies;
     }
 
     // 스터디 생성
