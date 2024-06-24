@@ -10,6 +10,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class FavoriteService {
 
@@ -63,6 +66,15 @@ public class FavoriteService {
 
         favoriteRepository.delete(favorite);
         return true;
+    }
+
+    // 즐겨찾기 조회
+    public List<Study> findFavoriteStudyByUserId(String userId) {
+        User user = userRepository.findByUserId(userId);
+        List<Favorite> favorites = favoriteRepository.findByUser(user);
+        return favorites.stream()
+                .map(Favorite::getStudy)
+                .collect(Collectors.toList());
     }
 
     // 즐겨찾기 등록 상태 확인
