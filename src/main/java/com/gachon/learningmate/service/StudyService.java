@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class StudyServices {
+public class StudyService {
 
     // 사진 업로드 경로
     @Value("${file.upload-dir}")
@@ -42,7 +42,7 @@ public class StudyServices {
     private final UserRepository userRepository;
 
     @Autowired
-    public StudyServices(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository, StudyMemberRepository studyMemberRepository, UserRepository userRepository) {
+    public StudyService(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository, StudyMemberRepository studyMemberRepository, UserRepository userRepository) {
         this.studyRepository = studyRepository;
         this.studyJoinRepository = studyJoinRepository;
         this.studyMemberRepository = studyMemberRepository;
