@@ -15,4 +15,7 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
 
     // 스터디 아이디로 스터디 목록 검색
     Page<Study> findStudyByCreatorId(User user, Pageable pageable);
+
+    // 최근 생성 스터디 조회
+    Page<Study> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }
