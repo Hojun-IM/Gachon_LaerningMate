@@ -9,7 +9,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
+    // 사용자랑 스터디 조회
     boolean existsByUserAndStudy(User user, Study study);
 
-    void deleteByUserAndStudy(User user, Study study);
+    // 즐겨찾기 조회
+    Favorite findByUserAndStudy(User user, Study study);
 }
