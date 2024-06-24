@@ -5,6 +5,7 @@ import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.dto.StudyJoinDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
 import com.gachon.learningmate.data.entity.Study;
+import com.gachon.learningmate.service.FavoriteService;
 import com.gachon.learningmate.service.StudyService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -25,10 +26,12 @@ import java.util.Map;
 public class StudyController extends BaseController {
 
     private final StudyService studyService;
+    private final FavoriteService favoriteService;
 
     @Autowired
-    public StudyController(StudyService studyService) {
+    public StudyController(StudyService studyService, FavoriteService favoriteService) {
         this.studyService = studyService;
+        this.favoriteService = favoriteService;
     }
 
     // 스터디 생성 페이지
@@ -119,9 +122,12 @@ public class StudyController extends BaseController {
         addUserInfoToModel(model);
         String currentUserId = studyService.getAuthentication().getUsername();
         Study study = studyService.findByStudyId(studyId);
+        boolean isFavorite = favoriteService.isFavorite(currentUserId, studyId);
 
+        model.addAttribute("currentUserId", currentUserId);
         model.addAttribute("study", study);
         model.addAttribute("isCreator", study.getCreatorId().getUserId().equals(currentUserId));
+        model.addAttribute("isFavorite", isFavorite);
 
         return "studyInfo";
     }
