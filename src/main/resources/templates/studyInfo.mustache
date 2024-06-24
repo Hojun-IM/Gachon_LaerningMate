@@ -116,25 +116,9 @@
                         icon.classList.remove('bi-bookmark');
                         icon.classList.add('bi-bookmark-fill');
                     }
-                    // 여기서 메시지를 표시합니다.
-                    if (data && data.trim()) {
-                        alert(data.trim());
-                    }
                 })
                 .catch(error => console.error('Error:', error));
     }
-
-    // 페이지 로드 시 서버에서 전달된 메시지를 경고창으로 표시
-    window.onload = function() {
-        const error = '{{error}}';
-        const message = '{{message}}';
-
-        if (error) {
-            alert(error);
-        } else if (message) {
-            alert(message);
-        }
-    };
 </script>
 
 {{>layouts/footer}}
