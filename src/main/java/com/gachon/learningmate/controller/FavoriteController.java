@@ -24,11 +24,16 @@ public class FavoriteController extends BaseController {
     public String addFavorite(@RequestParam String userId, @RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
 
-        boolean success = favoriteService.addFavorite(userId, studyId);
-        if (success)
-            model.addAttribute("message", "즐겨찾기에 추가되었습니다.");
-        else
-            model.addAttribute("error", "즐겨찾기 추가에 실패했습니다.");
+        try {
+            boolean success = favoriteService.addFavorite(userId, studyId);
+            if (success) {
+                model.addAttribute("message", "즐겨찾기에 추가되었습니다.");
+            } else {
+                model.addAttribute("error", "이미 즐겨찾기에 추가되어 있습니다.");
+            }
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+        }
         return "redirect:/study/info?studyId=" + studyId;
     }
 
@@ -37,11 +42,16 @@ public class FavoriteController extends BaseController {
     public String removeFavorite(@RequestParam String userId, @RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
 
-        boolean success = favoriteService.removeFavorite(userId, studyId);
-        if (success)
-            model.addAttribute("message", "즐겨찾기에서 삭제되었습니다.");
-        else
-            model.addAttribute("error", "즐겨찾기 삭제에 실패했습니다.");
+        try {
+            boolean success = favoriteService.removeFavorite(userId, studyId);
+            if (success) {
+                model.addAttribute("message", "즐겨찾기에서 삭제되었습니다.");
+            } else {
+                model.addAttribute("error", "즐겨찾기에 존재하지 않습니다.");
+            }
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+        }
         return "redirect:/study/info?studyId=" + studyId;
     }
 }
