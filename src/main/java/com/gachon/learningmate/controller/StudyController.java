@@ -5,12 +5,11 @@ import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.dto.StudyJoinDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
 import com.gachon.learningmate.data.entity.Study;
-import com.gachon.learningmate.service.StudyServices;
+import com.gachon.learningmate.service.StudyService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,18 +24,18 @@ import java.util.Map;
 @RequestMapping("/study")
 public class StudyController extends BaseController {
 
-    private final StudyServices studyServices;
+    private final StudyService studyService;
 
     @Autowired
-    public StudyController(StudyServices studyServices) {
-        this.studyServices = studyServices;
+    public StudyController(StudyService studyService) {
+        this.studyService = studyService;
     }
 
     // 스터디 생성 페이지
     @GetMapping("/create")
     public String showCreateStudy(Model model) {
         addUserInfoToModel(model);
-        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
+        UserPrincipalDetails userPrincipalDetails = studyService.getAuthentication();
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
         model.addAttribute("email", userPrincipalDetails.getUserEamil());
         return "createStudy";
@@ -47,13 +46,13 @@ public class StudyController extends BaseController {
     public String createStudy(@RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
         addUserInfoToModel(model);
         try {
-            studyServices.createStudy(studyDto, photo);
+            studyService.createStudy(studyDto, photo);
         } catch (IOException | IllegalArgumentException e) {
-            UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
+            UserPrincipalDetails userPrincipalDetails = studyService.getAuthentication();
             model.addAttribute("username", userPrincipalDetails.getUserRealName());
             model.addAttribute("email", userPrincipalDetails.getUserEamil());
             model.addAttribute("error", e.getMessage());
-            Map<String, String> validatorResult = studyServices.validateHandling(result);
+            Map<String, String> validatorResult = studyService.validateHandling(result);
             validatorResult.forEach(model::addAttribute);
             return "createStudy";
         }
@@ -69,7 +68,7 @@ public class StudyController extends BaseController {
         // 한 페이지에 보여줄 아이템 수
         int pageSize = 12;
         int pageIndex = Math.max(page - 1, 0);
-        Page<Study> studyPage = studyServices.findAllStudy(PageRequest.of(pageIndex, pageSize));
+        Page<Study> studyPage = studyService.findAllStudy(PageRequest.of(pageIndex, pageSize));
 
         // 페이지 정보
         model.addAttribute("studies", studyPage.getContent());
@@ -91,12 +90,12 @@ public class StudyController extends BaseController {
     @GetMapping("/my")
     public String showMyStudy(@RequestParam(defaultValue = "1") int page, Model model) {
         addUserInfoToModel(model);
-        String userId = studyServices.getAuthentication().getUsername();
+        String userId = studyService.getAuthentication().getUsername();
 
         // 한 페이지에 보여줄 아이템 수
         int pageSize = 12;
         int pageIndex = Math.max(page - 1, 0);
-        Page<Study> studyPage = studyServices.findStudyByUserId(userId, PageRequest.of(pageIndex, pageSize));
+        Page<Study> studyPage = studyService.findStudyByUserId(userId, PageRequest.of(pageIndex, pageSize));
 
         // 페이지 정보
         model.addAttribute("studies", studyPage.getContent());
@@ -118,8 +117,8 @@ public class StudyController extends BaseController {
     @GetMapping("/info")
     public String showStudyInfo(@RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
-        String currentUserId = studyServices.getAuthentication().getUsername();
-        Study study = studyServices.findByStudyId(studyId);
+        String currentUserId = studyService.getAuthentication().getUsername();
+        Study study = studyService.findByStudyId(studyId);
 
         model.addAttribute("study", study);
         model.addAttribute("isCreator", study.getCreatorId().getUserId().equals(currentUserId));
@@ -130,7 +129,7 @@ public class StudyController extends BaseController {
     // 스터디 삭제
     @PostMapping("/delete")
     public String deleteStudy(@RequestParam int studyId) {
-        studyServices.deleteStudy(studyId);
+        studyService.deleteStudy(studyId);
         return "redirect:/study";
     }
 
@@ -138,8 +137,8 @@ public class StudyController extends BaseController {
     @GetMapping("/update")
     public String showUpdateStudyForm(@RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
-        Study study = studyServices.findByStudyId(studyId);
-        StudyDto studyDto = studyServices.buildStudyDto(study);
+        Study study = studyService.findByStudyId(studyId);
+        StudyDto studyDto = studyService.buildStudyDto(study);
 
         model.addAttribute("studyDto", studyDto);
         return "updateStudy";
@@ -151,10 +150,10 @@ public class StudyController extends BaseController {
         addUserInfoToModel(model);
         try {
             studyDto.setStudyId(studyId);
-            studyServices.updateStudy(studyDto, photo);
+            studyService.updateStudy(studyDto, photo);
         } catch (IOException | IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            Map<String, String> validatorResult = studyServices.validateHandling(result);
+            Map<String, String> validatorResult = studyService.validateHandling(result);
             validatorResult.forEach(model::addAttribute);
             return "updateStudy";
         }
@@ -166,16 +165,16 @@ public class StudyController extends BaseController {
     @GetMapping("/apply")
     public String showApplyStudyForm(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, StudyDto studyDto, Model model) {
         addUserInfoToModel(model);
-        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
+        UserPrincipalDetails userPrincipalDetails = studyService.getAuthentication();
         studyDto.setCreatorId(userPrincipalDetails.getUser());
         studyDto.setStudyId(studyId);
 
         if (photo == null || photo.isEmpty()) {
-            Study existingStudy = studyServices.findByStudyId(studyId);
+            Study existingStudy = studyService.findByStudyId(studyId);
             studyDto.setPhotoPath(existingStudy.getPhotoPath());
         } else {
             try {
-                studyServices.validatePhoto(photo, studyDto);
+                studyService.validatePhoto(photo, studyDto);
             } catch (IOException e) {
                 model.addAttribute("error_photoPath", e.getMessage());
                 model.addAttribute("studyDto", studyDto);
@@ -195,13 +194,13 @@ public class StudyController extends BaseController {
     public String applyStudy(@RequestParam int studyId, @Valid StudyJoinDto studyJoinDto, BindingResult bindingResult, Model model) {
         addUserInfoToModel(model);
 
-        UserPrincipalDetails userPrincipalDetails = studyServices.getAuthentication();
+        UserPrincipalDetails userPrincipalDetails = studyService.getAuthentication();
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
         model.addAttribute("email", userPrincipalDetails.getUserEamil());
         model.addAttribute("studyId", studyId);
 
         try {
-            studyServices.applyStudy(studyId, studyJoinDto, bindingResult);
+            studyService.applyStudy(studyId, studyJoinDto, bindingResult);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error_apply", e.getMessage());
             model.addAttribute("studyJoinDto", studyJoinDto);
@@ -216,7 +215,7 @@ public class StudyController extends BaseController {
     public String showStudyJoinList(@RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
         try {
-            List<StudyJoinDto> studyJoinList = studyServices.getStudyJoinByStudyId(studyId);
+            List<StudyJoinDto> studyJoinList = studyService.getStudyJoinByStudyId(studyId);
             model.addAttribute("studyJoinList", studyJoinList);
         } catch (IllegalAccessException e) {
             model.addAttribute("error_apply", e.getMessage());
@@ -230,7 +229,7 @@ public class StudyController extends BaseController {
     public String acceptStudyJoin(@RequestParam long joinId, @RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
         try {
-            studyServices.acceptStudyJoin(joinId);
+            studyService.acceptStudyJoin(joinId);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error_apply", e.getMessage());
             return "redirect:/study/apply/list?studyId=" + studyId;
@@ -243,7 +242,7 @@ public class StudyController extends BaseController {
     public String rejectStudyJoin(@RequestParam long joinId, @RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
         try {
-            studyServices.rejectStudyJoin(joinId);
+            studyService.rejectStudyJoin(joinId);
         } catch (IllegalArgumentException e) {
             model.addAttribute("error_apply", e.getMessage());
             return "redirect:/study/apply/list?studyId=" + studyId;
