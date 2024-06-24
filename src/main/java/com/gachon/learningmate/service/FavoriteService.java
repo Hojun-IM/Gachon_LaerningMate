@@ -24,6 +24,7 @@ public class FavoriteService {
         this.studyRepository = studyRepository;
     }
 
+    // 즐겨찾기 추가
     @Transactional
     public boolean addFavorite(String userId, int studyId) {
         User user = userRepository.findByUserId(userId);
@@ -44,6 +45,7 @@ public class FavoriteService {
         return true;
     }
 
+    // 즐겨찾기 삭제
     @Transactional
     public boolean removeFavorite(String userId, int studyId) {
         User user = userRepository.findByUserId(userId);
@@ -54,11 +56,25 @@ public class FavoriteService {
         if (study == null)
             throw new IllegalArgumentException("잘못된 스터디 정보입니다.");
 
-        if (favoriteRepository.existsByUserAndStudy(user, study))
-            return false;
+        Favorite favorite = favoriteRepository.findByUserAndStudy(user, study);
+        if (favorite == null) {
+            throw new IllegalArgumentException("즐겨찾기에 존재하지 않습니다.");
+        }
 
-        favoriteRepository.deleteByUserAndStudy(user, study);
+        favoriteRepository.delete(favorite);
         return true;
+    }
+
+    // 즐겨찾기 등록 상태 확인
+    public boolean isFavorite(String userId, int studyId) {
+        User user = userRepository.findByUserId(userId);
+        Study study = studyRepository.findByStudyId(studyId);
+
+        if (user == null || study == null) {
+            return false;
+        }
+
+        return favoriteRepository.existsByUserAndStudy(user, study);
     }
 
 }
