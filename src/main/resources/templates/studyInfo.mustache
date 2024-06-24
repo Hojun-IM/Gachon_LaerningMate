@@ -13,7 +13,10 @@
                         </div>
 
                         <div class="card-body p-4 p-md-5">
-                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2">스터디 정보</h3>
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 px-md-2">
+                                스터디 정보
+                                <i id="bookmarkIcon" class="bi {{#isFavorite}}bi-bookmark-fill{{/isFavorite}}{{^isFavorite}}bi-bookmark{{/isFavorite}}" style="cursor: pointer;" onclick="toggleFavorite('{{study.studyId}}')"></i>
+                            </h3>
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <label for="username" class="form-label">스터디장</label>
@@ -80,5 +83,58 @@
         </div>
     </div>
 </section>
+
+<script>
+    function toggleFavorite(studyId) {
+        const icon = document.getElementById('bookmarkIcon');
+        const isFavorite = icon.classList.contains('bi-bookmark-fill');
+
+        const url = isFavorite ? '/favorite/remove' : '/favorite/add';
+        const userId = '{{currentUserId}}'; // Assuming you have this information available
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                userId: userId,
+                studyId: studyId
+            })
+        })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    if (isFavorite) {
+                        icon.classList.remove('bi-bookmark-fill');
+                        icon.classList.add('bi-bookmark');
+                    } else {
+                        icon.classList.remove('bi-bookmark');
+                        icon.classList.add('bi-bookmark-fill');
+                    }
+                    // 여기서 메시지를 표시합니다.
+                    if (data && data.trim()) {
+                        alert(data.trim());
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+    }
+
+    // 페이지 로드 시 서버에서 전달된 메시지를 경고창으로 표시
+    window.onload = function() {
+        const error = '{{error}}';
+        const message = '{{message}}';
+
+        if (error) {
+            alert(error);
+        } else if (message) {
+            alert(message);
+        }
+    };
+</script>
 
 {{>layouts/footer}}
