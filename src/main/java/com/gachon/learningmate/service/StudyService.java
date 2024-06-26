@@ -5,10 +5,7 @@ import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.dto.StudyJoinDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
 import com.gachon.learningmate.data.entity.*;
-import com.gachon.learningmate.data.repository.StudyJoinRepository;
-import com.gachon.learningmate.data.repository.StudyMemberRepository;
-import com.gachon.learningmate.data.repository.StudyRepository;
-import com.gachon.learningmate.data.repository.UserRepository;
+import com.gachon.learningmate.data.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class StudyService {
 
+    private final FavoriteRepository favoriteRepository;
     // 사진 업로드 경로
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -43,11 +41,12 @@ public class StudyService {
     private final UserRepository userRepository;
 
     @Autowired
-    public StudyService(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository, StudyMemberRepository studyMemberRepository, UserRepository userRepository) {
+    public StudyService(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository, StudyMemberRepository studyMemberRepository, UserRepository userRepository, FavoriteRepository favoriteRepository) {
         this.studyRepository = studyRepository;
         this.studyJoinRepository = studyJoinRepository;
         this.studyMemberRepository = studyMemberRepository;
         this.userRepository = userRepository;
+        this.favoriteRepository = favoriteRepository;
     }
 
     // 전체 스터디 조회
@@ -116,6 +115,8 @@ public class StudyService {
         UserPrincipalDetails currentUser = getAuthentication();
         validateStudyAndUser(study, currentUser);
 
+        List<Favorite> favorites = favoriteRepository.findByStudy(study);
+        favoriteRepository.deleteAll(favorites);
         List<StudyMember> studyMembers = studyMemberRepository.findByStudy(study);
         studyMemberRepository.deleteAll(studyMembers);
         studyRepository.delete(study);
