@@ -270,7 +270,15 @@ public class StudyService {
     // 로그인 된 사용자 정보 가져오기
     public UserPrincipalDetails getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (UserPrincipalDetails) authentication.getPrincipal();
+        if (authentication == null) {
+            throw new RuntimeException("인증 정보를 가져올 수 없습니다.");
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserPrincipalDetails) {
+            return (UserPrincipalDetails) principal;
+        } else {
+            throw new RuntimeException("인증 정보가 올바르지 않습니다.");
+        }
     }
 
     // 스터디 조회
