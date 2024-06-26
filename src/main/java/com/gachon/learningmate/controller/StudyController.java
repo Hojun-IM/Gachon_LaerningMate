@@ -119,15 +119,25 @@ public class StudyController extends BaseController {
     // 스터디 상세 정보
     @GetMapping("/info")
     public String showStudyInfo(@RequestParam int studyId, Model model) {
-        addUserInfoToModel(model);
-        String currentUserId = studyService.getAuthentication().getUsername();
+        String currentUserId = null;
+        boolean isFavorite = false;
+        boolean isCreator = false;
         Study study = studyService.findByStudyId(studyId);
-        boolean isFavorite = favoriteService.isFavorite(currentUserId, studyId);
 
-        model.addAttribute("currentUserId", currentUserId);
+        try {
+            UserPrincipalDetails currentUser = studyService.getAuthentication();
+            currentUserId = currentUser.getUsername();
+            isFavorite = favoriteService.isFavorite(currentUserId, studyId);
+            isCreator = study.getCreatorId().getUserId().equals(currentUserId);
+        } catch (RuntimeException e) {
+            // 로그인이 되어 있지 않은 경우
+            currentUserId = null;
+        }
+
         model.addAttribute("study", study);
-        model.addAttribute("isCreator", study.getCreatorId().getUserId().equals(currentUserId));
+        model.addAttribute("currentUserId", currentUserId != null ? currentUserId : "");
         model.addAttribute("isFavorite", isFavorite);
+        model.addAttribute("isCreator", isCreator);
 
         return "studyInfo";
     }

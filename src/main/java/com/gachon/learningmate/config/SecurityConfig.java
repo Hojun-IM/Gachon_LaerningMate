@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 public class SecurityConfig {
 
     private static final String[] PUBLIC_MATCHERS = {
-            "/", "/home", "/register", "/login", "/register/send-verification", "/register/verify-code", "/study", "/study/create", "/study/info", "/study/participate", "/error"
+            "/", "/home", "/register", "/login", "/register/send-verification", "/register/verify-code", "/study", "/study/create", "/study/info", "/study/participate", "/error", "/study/info**"
     };
 
     private static final String[] STATIC_RESOURCES = {
