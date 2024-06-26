@@ -17,6 +17,9 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     // 즐겨찾기 조회
     Favorite findByUserAndStudy(User user, Study study);
     
-    // 즐겨찾기 조회
+    // 사용자로 즐겨찾기 조회
     List<Favorite> findByUser(User user);
+
+    // 스터디로 즐겨찾기 조회
+    List<Favorite> findByStudy(Study study);
 }
