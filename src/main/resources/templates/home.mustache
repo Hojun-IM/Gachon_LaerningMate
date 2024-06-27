@@ -1,17 +1,32 @@
 {{>layouts/header}}
 
-<!-- List -->
-<div class="mt-auto d-flex justify-content-center">
-    <ul>
-        <li style="display: inline-block; margin-right: 40px;"><a href="/study/my">내 스터디</a></li>
-        <li style="display: inline-block; margin-left: 40px; margin-right: 40px"><a href="/study">스터디 목록</a></li>
-        <li style="display: inline-block; margin-left: 40px;"><a href="/study/create">스터디 생성</a></li>
-    </ul>
+<!-- 상단 배경 이미지 섹션 -->
+<div class="bg-image position-relative" style="background-image: url('/img/home.jpg'); background-size: cover; background-position: center; padding-top: 50px; padding-bottom: 100px; height: 600px;">
+    <!-- 명언 -->
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <p style="font-weight: bold; font-size: 2.5em; font-family: 'Cursive', sans-serif; text-align: center; color: white;">
+            All our dreams can come true.<br>
+            If we have the courage to pursue them.
+        </p>
+    </div>
+
+    <!-- 목록 -->
+    <div class="d-flex justify-content-center position-absolute w-100" style="bottom: 30px;">
+        <ul class="list-inline">
+            <li class="list-inline-item" style="margin-right: 20px;">
+                <a href="/study/my" class="btn btn-outline-light">내 스터디</a>
+            </li>
+            <li class="list-inline-item" style="margin-left: 20px; margin-right: 20px;">
+                <a href="/study" class="btn btn-outline-light">스터디 목록</a>
+            </li>
+            <li class="list-inline-item" style="margin-left: 20px;">
+                <a href="/study/create" class="btn btn-outline-light">스터디 생성</a>
+            </li>
+        </ul>
+    </div>
 </div>
 
-<hr class="mt-5" style="width: 80%; margin: 0px auto;">
-
-<!-- Search -->
+<!-- 검색 -->
 <div class="mt-5 mb-5">
     <form class="d-flex justify-content-center" role="search">
         <input class="form-control me-2 w-75" type="search" placeholder="Search" aria-label="Search">
@@ -19,12 +34,31 @@
     </form>
 </div>
 
-<!-- Studies -->
+<!-- 스터디 -->
 <div class="container mt-4">
     <div class="card-group-scroll" style="display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap;">
-        <!-- Favorite Studies -->
+        <!-- 즐겨찾기 스터디 -->
         {{#favoriteStudies}}
             <a href="/study/info?studyId={{studyId}}" class="card-link" style="text-decoration: none; color: inherit;">
+            <div class="card" style="min-width: 300px; margin-right: 1rem; display: inline-block;">
+                <img src="{{photoPath}}" class="card-img-top" alt="Study Image" style="max-width: 100%; height: auto; max-height: 100px; object-fit: cover;" />
+                <div class="card-body">
+                    <h5 class="card-title">{{studyName}}</h5>
+                    <p class="card-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px;">
+                        {{description}}
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Last updated {{createdAt}}</small>
+                </div>
+            </div>
+            </a>
+        {{/favoriteStudies}}
+
+        <!-- 최근등록 스터디 -->
+        {{^favoriteStudies}}
+            {{#recentStudies}}
+                <a href="/study/info?studyId={{studyId}}" class="card-link" style="text-decoration: none; color: inherit;">
                 <div class="card" style="min-width: 300px; margin-right: 1rem; display: inline-block;">
                     <img src="{{photoPath}}" class="card-img-top" alt="Study Image" style="max-width: 100%; height: auto; max-height: 100px; object-fit: cover;" />
                     <div class="card-body">
@@ -37,25 +71,6 @@
                         <small class="text-muted">Last updated {{createdAt}}</small>
                     </div>
                 </div>
-            </a>
-        {{/favoriteStudies}}
-
-        <!-- Recent Studies -->
-        {{^favoriteStudies}}
-            {{#recentStudies}}
-                <a href="/study/info?studyId={{studyId}}" class="card-link" style="text-decoration: none; color: inherit;">
-                    <div class="card" style="min-width: 300px; margin-right: 1rem; display: inline-block;">
-                        <img src="{{photoPath}}" class="card-img-top" alt="Study Image" style="max-width: 100%; height: auto; max-height: 100px; object-fit: cover;" />
-                        <div class="card-body">
-                            <h5 class="card-title">{{studyName}}</h5>
-                            <p class="card-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px;">
-                                {{description}}
-                            </p>
-                        </div>
-                        <div class="card-footer">
-                            <small class="text-muted">Last updated {{createdAt}}</small>
-                        </div>
-                    </div>
                 </a>
             {{/recentStudies}}
         {{/favoriteStudies}}
