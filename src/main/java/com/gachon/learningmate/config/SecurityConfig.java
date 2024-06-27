@@ -19,7 +19,7 @@ public class SecurityConfig {
     };
 
     private static final String[] STATIC_RESOURCES = {
-            "/css/**", "/js/**", "/img/**"
+            "static/**", "/css/**", "/js/**", "/img/**"
     };
 
     @Bean
