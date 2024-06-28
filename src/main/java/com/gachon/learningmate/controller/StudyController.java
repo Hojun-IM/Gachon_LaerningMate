@@ -266,4 +266,26 @@ public class StudyController extends BaseController {
         return "redirect:/study/apply/list?studyId=" + studyId;
     }
 
+    @GetMapping("/search")
+    public String searchStudy(@RequestParam String keyword, @RequestParam(defaultValue = "1") int page, Model model){
+        addUserInfoToModel(model);
+
+        int pageSize = 12;
+        int pageIndex = Math.max(page - 1, 0);
+        Page<Study> studyPage = studyService.searchStudiesByName(keyword, PageRequest.of(pageIndex, pageSize));
+
+        model.addAttribute("studies", studyPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", studyPage.getTotalPages());
+        model.addAttribute("hasNext", studyPage.hasNext());
+        model.addAttribute("hasPrevious", studyPage.hasPrevious());
+        model.addAttribute("nextPage", page + 1);
+        model.addAttribute("prevPage", (page > 1) ? page - 1 : 1);
+
+        List<PageItem> pages = PageItem.createPageItems(page, studyPage.getTotalPages());
+        model.addAttribute("pages", pages);
+
+        return "study";
+    }
+
 }

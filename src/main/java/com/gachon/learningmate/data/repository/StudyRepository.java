@@ -10,12 +10,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudyRepository extends JpaRepository<Study, Long> {
 
-    // 스터디 아이디로 스터디 검색
+    // 스터디 아이디로 스터디 조회
     Study findByStudyId(int studyId);
 
-    // 스터디 아이디로 스터디 목록 검색
+    // 스터디 아이디로 스터디 목록 조회
     Page<Study> findStudyByCreatorId(User user, Pageable pageable);
 
     // 최근 생성 스터디 조회
     Page<Study> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    // 스터디 검색
+    Page<Study> findByStudyNameContainingIgnoreCase(String keyword, Pageable pageable);
 }

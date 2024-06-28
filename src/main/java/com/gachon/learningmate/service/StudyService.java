@@ -67,6 +67,11 @@ public class StudyService {
         return recentStudies;
     }
 
+    // 스터디 검색
+    public Page<Study> searchStudiesByName(String keyword, Pageable pageable) {
+        return studyRepository.findByStudyNameContainingIgnoreCase(keyword, pageable);
+    }
+
     // 스터디 생성
     @Transactional
     public void createStudy(StudyDto studyDto, MultipartFile photo) throws IOException {
