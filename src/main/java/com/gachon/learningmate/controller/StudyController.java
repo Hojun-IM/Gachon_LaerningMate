@@ -121,6 +121,7 @@ public class StudyController extends BaseController {
     // 스터디 상세 정보
     @GetMapping("/info")
     public String showStudyInfo(@RequestParam int studyId, Model model) {
+        addUserInfoToModel(model);
         String currentUserId = null;
         boolean isFavorite = false;
         boolean isCreator = false;
@@ -146,7 +147,8 @@ public class StudyController extends BaseController {
 
     // 스터디 삭제
     @PostMapping("/delete")
-    public String deleteStudy(@RequestParam int studyId) {
+    public String deleteStudy(@RequestParam int studyId, Model model) {
+        addUserInfoToModel(model);
         studyService.deleteStudy(studyId);
         return "redirect:/study";
     }
