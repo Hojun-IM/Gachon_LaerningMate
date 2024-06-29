@@ -8,6 +8,7 @@ import com.gachon.learningmate.data.entity.Study;
 import com.gachon.learningmate.data.entity.StudyMember;
 import com.gachon.learningmate.service.FavoriteService;
 import com.gachon.learningmate.service.StudyService;
+import com.gachon.learningmate.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,18 +30,20 @@ public class StudyController extends BaseController {
 
     private final StudyService studyService;
     private final FavoriteService favoriteService;
+    private final UserService userService;
 
     @Autowired
-    public StudyController(StudyService studyService, FavoriteService favoriteService) {
+    public StudyController(StudyService studyService, FavoriteService favoriteService, UserService userService) {
         this.studyService = studyService;
         this.favoriteService = favoriteService;
+        this.userService = userService;
     }
 
     // 스터디 생성 페이지
     @GetMapping("/create")
     public String showCreateStudy(Model model) {
         addUserInfoToModel(model);
-        UserPrincipalDetails userPrincipalDetails = studyService.getAuthentication();
+        UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
         model.addAttribute("email", userPrincipalDetails.getUserEamil());
         return "createStudy";
@@ -53,7 +56,7 @@ public class StudyController extends BaseController {
         try {
             studyService.createStudy(studyDto, photo);
         } catch (IOException | IllegalArgumentException e) {
-            UserPrincipalDetails userPrincipalDetails = studyService.getAuthentication();
+            UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
             model.addAttribute("username", userPrincipalDetails.getUserRealName());
             model.addAttribute("email", userPrincipalDetails.getUserEamil());
             model.addAttribute("error", e.getMessage());
@@ -95,7 +98,7 @@ public class StudyController extends BaseController {
     @GetMapping("/my")
     public String showMyStudy(@RequestParam(defaultValue = "1") int page, Model model) {
         addUserInfoToModel(model);
-        String userId = studyService.getAuthentication().getUsername();
+        String userId = userService.getAuthentication().getUsername();
 
         // 한 페이지에 보여줄 아이템 수
         int pageSize = 12;
@@ -128,7 +131,7 @@ public class StudyController extends BaseController {
         Study study = studyService.findByStudyId(studyId);
 
         try {
-            UserPrincipalDetails currentUser = studyService.getAuthentication();
+            UserPrincipalDetails currentUser = userService.getAuthentication();
             currentUserId = currentUser.getUsername();
             isFavorite = favoriteService.isFavorite(currentUserId, studyId);
             isCreator = study.getCreatorId().getUserId().equals(currentUserId);
@@ -185,7 +188,7 @@ public class StudyController extends BaseController {
     @GetMapping("/apply")
     public String showApplyStudyForm(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, StudyDto studyDto, Model model) {
         addUserInfoToModel(model);
-        UserPrincipalDetails userPrincipalDetails = studyService.getAuthentication();
+        UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
         studyDto.setCreatorId(userPrincipalDetails.getUser());
         studyDto.setStudyId(studyId);
 
@@ -214,7 +217,7 @@ public class StudyController extends BaseController {
     public String applyStudy(@RequestParam int studyId, @Valid StudyJoinDto studyJoinDto, BindingResult bindingResult, Model model) {
         addUserInfoToModel(model);
 
-        UserPrincipalDetails userPrincipalDetails = studyService.getAuthentication();
+        UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
         model.addAttribute("email", userPrincipalDetails.getUserEamil());
         model.addAttribute("studyId", studyId);

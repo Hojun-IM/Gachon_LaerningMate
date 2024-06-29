@@ -39,14 +39,18 @@ public class StudyService {
     private final StudyJoinRepository studyJoinRepository;
     private final StudyMemberRepository studyMemberRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
-    public StudyService(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository, StudyMemberRepository studyMemberRepository, UserRepository userRepository, FavoriteRepository favoriteRepository) {
+    public StudyService(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository,
+                        StudyMemberRepository studyMemberRepository, UserRepository userRepository,
+                        FavoriteRepository favoriteRepository, UserService userService) {
         this.studyRepository = studyRepository;
         this.studyJoinRepository = studyJoinRepository;
         this.studyMemberRepository = studyMemberRepository;
         this.userRepository = userRepository;
         this.favoriteRepository = favoriteRepository;
+        this.userService = userService;
     }
 
     // 전체 스터디 조회
@@ -81,7 +85,7 @@ public class StudyService {
     // 스터디 생성
     @Transactional
     public void createStudy(StudyDto studyDto, MultipartFile photo) throws IOException {
-        UserPrincipalDetails userPrincipalDetails = getAuthentication();
+        UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
         studyDto.setCreatorId(userPrincipalDetails.getUser());
         validatePhoto(photo, studyDto);
 
@@ -106,7 +110,7 @@ public class StudyService {
     @Transactional
     public void updateStudy(StudyDto studyDto, MultipartFile photo) throws IOException {
         Study existingStudy = studyRepository.findByStudyId(studyDto.getStudyId());
-        UserPrincipalDetails principalDetails = getAuthentication();
+        UserPrincipalDetails principalDetails = userService.getAuthentication();
         validateStudyAndUser(existingStudy, principalDetails);
 
         if (photo != null && !photo.isEmpty()) {
@@ -123,7 +127,7 @@ public class StudyService {
     @Transactional
     public void deleteStudy(int studyId) {
         Study study = studyRepository.findByStudyId(studyId);
-        UserPrincipalDetails currentUser = getAuthentication();
+        UserPrincipalDetails currentUser = userService.getAuthentication();
         validateStudyAndUser(study, currentUser);
 
         List<Favorite> favorites = favoriteRepository.findByStudy(study);
@@ -136,7 +140,7 @@ public class StudyService {
     // 스터디 신청 목록 가져오기
     @Transactional(readOnly = true)
     public List<StudyJoinDto> getStudyJoinByStudyId(int studyId) throws IllegalAccessException {
-        UserPrincipalDetails currentUser = getAuthentication();
+        UserPrincipalDetails currentUser = userService.getAuthentication();
         String currentUserId = currentUser.getUsername();
 
         Study study = studyRepository.findByStudyId(studyId);
@@ -163,7 +167,7 @@ public class StudyService {
             throw new IllegalArgumentException("자기소개는 최소 10글자 이상이어야 합니다.");
         }
 
-        UserPrincipalDetails currentUser = getAuthentication();
+        UserPrincipalDetails currentUser = userService.getAuthentication();
         Study study = studyRepository.findByStudyId(studyId);
 
         if (study == null) {
@@ -275,20 +279,6 @@ public class StudyService {
 
         if (!study.getCreatorId().getUserId().equals(currentUser.getUser().getUserId())) {
             throw new IllegalStateException("스터디에 대한 권한이 없습니다.");
-        }
-    }
-
-    // 로그인 된 사용자 정보 가져오기
-    public UserPrincipalDetails getAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            throw new RuntimeException("인증 정보를 가져올 수 없습니다.");
-        }
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof UserPrincipalDetails) {
-            return (UserPrincipalDetails) principal;
-        } else {
-            throw new RuntimeException("인증 정보가 올바르지 않습니다.");
         }
     }
 
