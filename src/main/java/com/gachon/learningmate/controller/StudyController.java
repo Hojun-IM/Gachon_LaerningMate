@@ -5,6 +5,7 @@ import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.dto.StudyJoinDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
 import com.gachon.learningmate.data.entity.Study;
+import com.gachon.learningmate.data.entity.StudyMember;
 import com.gachon.learningmate.service.FavoriteService;
 import com.gachon.learningmate.service.StudyService;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -266,6 +268,7 @@ public class StudyController extends BaseController {
         return "redirect:/study/apply/list?studyId=" + studyId;
     }
 
+    // 스터디 검색
     @GetMapping("/search")
     public String searchStudy(@RequestParam String keyword, @RequestParam(defaultValue = "1") int page, Model model){
         addUserInfoToModel(model);
@@ -288,4 +291,17 @@ public class StudyController extends BaseController {
         return "study";
     }
 
+    // 스터디 멤버 조회
+    @GetMapping("/member")
+    public String showStudyMember(@RequestParam int studyId, Model model) {
+        addUserInfoToModel(model);
+
+        List<StudyMember> studyMemberList = studyService.findStudyMemberByStudyId(studyId);
+        studyMemberList.forEach(member -> {
+            member.setFormattedJoinDate(new SimpleDateFormat("yyyy-MM-dd").format(member.getJoinDate()));
+        });
+        model.addAttribute("studyMemberList", studyMemberList);
+
+        return "studyMemberList";
+    }
 }

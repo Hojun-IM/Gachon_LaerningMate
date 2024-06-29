@@ -1,0 +1,53 @@
+{{>layouts/header}}
+
+<div class="container custom-container">
+    <div class="row">
+        <div class="col-12 mb-3 mb-lg-5">
+            <div class="overflow-hidden card table-nowrap table-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">스터디 멤버 명단</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0 table-nowrap">
+                        <thead class="small text-uppercase bg-body text-muted">
+                        <tr>
+                            <th style="white-space: nowrap; width: 150px;">이름</th>
+                            <th style="white-space: nowrap; width: 200px;">이메일</th>
+                            <th style="white-space: nowrap; width: 200px;">가입 날짜</th>
+                            <th style="white-space: nowrap;">역할</th>
+                            <th class="text-end" style="white-space: nowrap; width: 150px;">채팅</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#studyMemberList}}
+                            <tr class="align-middle">
+                                <td style="white-space: nowrap;">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <div class="h6 mb-0 lh-1">{{user.username}}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="white-space: nowrap;">{{user.email}}</td>
+                                <td style="white-space: nowrap;">{{formattedJoinDate}}</td>
+                                <td style="white-space: nowrap;">{{role}}</td>
+                                <td class="text-end" style="white-space: nowrap;">
+                                    <form action="/chat" method="get" style="display:inline;">
+                                        <input type="hidden" name="recipientId" value="{{user.username}}">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fa-solid fa-comments" aria-hidden="true"></i> 채팅 보내기
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {{/studyMemberList}}
+                        </tbody>
+                    </table>
+                    <div class="text-danger" style="min-height: 8px;">{{#error_remove}}{{error_remove}}{{/error_remove}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{>layouts/footer}}

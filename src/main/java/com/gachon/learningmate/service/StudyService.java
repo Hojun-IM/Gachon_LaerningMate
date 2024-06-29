@@ -72,6 +72,12 @@ public class StudyService {
         return studyRepository.findByStudyNameContainingIgnoreCase(keyword, pageable);
     }
 
+    // 스터디 가입된 멤버 조회
+    public List<StudyMember> findStudyMemberByStudyId(int studyId) {
+        Study study = studyRepository.findByStudyId(studyId);
+        return studyMemberRepository.findByStudy(study);
+    }
+
     // 스터디 생성
     @Transactional
     public void createStudy(StudyDto studyDto, MultipartFile photo) throws IOException {

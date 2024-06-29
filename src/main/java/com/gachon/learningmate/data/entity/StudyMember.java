@@ -36,4 +36,8 @@ public class StudyMember {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StudyJoinRole role;
+
+    @Transient
+    private String formattedJoinDate;
+
 }
