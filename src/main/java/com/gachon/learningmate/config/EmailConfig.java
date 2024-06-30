@@ -62,6 +62,7 @@ public class EmailConfig {
         props.put("mail.smtp.connectiontimeout", connectionTimeout);
         props.put("mail.smtp.timeout", timeout);
         props.put("mail.smtp.writetimeout", writeTimeout);
+        props.put("mail.debug", "true");
 
         return props;
     }

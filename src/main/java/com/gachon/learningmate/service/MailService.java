@@ -25,6 +25,7 @@ public class MailService {
         message.setTo(to);            // 보내는 이메일
         message.setSubject(subject);  // 제목
         message.setText(text);        // 내용
+        message.setFrom("gachonlearningmate@gmail.com");  // 발신자 이메일
 
         return message;
     }
