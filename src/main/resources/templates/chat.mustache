@@ -1,0 +1,85 @@
+{{>layouts/header}}
+
+<div class="container" style="max-width:1170px; margin:auto;">
+    <h3 class="text-center">LearningMate Chat</h3>
+    <div class="messaging" style="padding: 0 0 50px 0;">
+        <div class="inbox_msg" style="border: 1px solid #c4c4c4; clear: both; overflow: hidden;">
+            <div class="mesgs" style="float: left; padding: 30px 15px 0 25px; width: 100%;">
+                <div class="msg_history" id="msgArea" style="height: 600px; overflow-y: scroll; display: flex; flex-direction: column;">
+                </div>
+                <div class="type_msg" style="border-top: 1px solid #c4c4c4; position: relative;">
+                    <div class="input_msg_write">
+                        <input type="text" id="msg" class="write_msg" placeholder="Type a message" style="background: rgba(0, 0, 0, 0); border: medium none; color: #4c4c4c; font-size: 15px; min-height: 48px; width: 100%;">
+                        <button class="msg_send_btn" type="button" id="button-send" style="background: #05728f; border: medium none; border-radius: 50%; color: #fff; cursor: pointer; font-size: 17px; height: 33px; position: absolute; right: 0; top: 11px; width: 33px;">
+                            <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+
+        const username = "{{{username}}}";
+
+        $("#disconn").on("click", (e) => {
+            disconnect();
+        });
+
+        $("#button-send").on("click", (e) => {
+            send();
+        });
+
+        const websocket = new WebSocket("ws://localhost:8080/ws/chat");
+
+        websocket.onmessage = onMessage;
+        websocket.onopen = onOpen;
+        websocket.onclose = onClose;
+
+        function send() {
+            let msg = document.getElementById("msg");
+            console.log(username + ":" + msg.value);
+            websocket.send(username + ":" + msg.value);
+            msg.value = '';
+        }
+
+        function onClose(evt) {
+            var str = username + ": 님이 방을 나가셨습니다.";
+            websocket.send(str);
+        }
+
+        function onOpen(evt) {
+            var str = username + ": 님이 입장하셨습니다.";
+            websocket.send(str);
+        }
+
+        function onMessage(msg) {
+            var data = msg.data;
+            var arr = data.split(":");
+            var sessionId = arr[0];
+            var message = arr[1];
+            var cur_session = username;
+
+            if (sessionId === cur_session) {
+                var str = "<div class='msg right-msg' style='display: flex; margin-bottom: 10px; justify-content: flex-end;'>";
+                str += "<div class='msg-bubble' style='max-width: 60%; padding: 10px; border-radius: 10px; background-color: #dcf8c6;'>";
+                str += "<div class='msg-text' style='font-size: 15px;'>";
+                str += "<b>" + sessionId + " : " + message + "</b>";
+                str += "</div></div></div>";
+                $("#msgArea").append(str);
+            } else {
+                var str = "<div class='msg left-msg' style='display: flex; margin-bottom: 10px; justify-content: flex-start;'>";
+                str += "<div class='msg-bubble' style='max-width: 60%; padding: 10px; border-radius: 10px; background-color: #f1f0f0;'>";
+                str += "<div class='msg-text' style='font-size: 15px;'>";
+                str += "<b>" + sessionId + " : " + message + "</b>";
+                str += "</div></div></div>";
+                $("#msgArea").append(str);
+            }
+        }
+    });
+</script>
+
+{{>layouts/footer}}
