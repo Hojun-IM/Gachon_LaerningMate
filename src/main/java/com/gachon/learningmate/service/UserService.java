@@ -1,7 +1,6 @@
 package com.gachon.learningmate.service;
 
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
-import com.gachon.learningmate.data.entity.User;
 import com.gachon.learningmate.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -16,10 +15,6 @@ public class UserService {
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    public User findUserById(String userId) {
-        return userRepository.findByUserId(userId);
     }
 
     // 로그인 된 사용자 정보 가져오기
