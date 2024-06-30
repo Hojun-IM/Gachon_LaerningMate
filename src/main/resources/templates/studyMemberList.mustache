@@ -15,7 +15,7 @@
                             <th style="white-space: nowrap; width: 200px;">이메일</th>
                             <th style="white-space: nowrap; width: 200px;">가입 날짜</th>
                             <th style="white-space: nowrap;">역할</th>
-                            <th class="text-end" style="white-space: nowrap; width: 150px;">채팅</th>
+                            <th class="text-end" style="white-space: nowrap; width: 150px;">작업</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -32,12 +32,22 @@
                                 <td style="white-space: nowrap;">{{formattedJoinDate}}</td>
                                 <td style="white-space: nowrap;">{{role}}</td>
                                 <td class="text-end" style="white-space: nowrap;">
-                                    <form action="/chat" method="get" style="display:inline;">
-                                        <input type="hidden" name="recipientId" value="{{user.userId}}">
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            <i class="fa-solid fa-comments" aria-hidden="true"></i> 채팅 보내기
-                                        </button>
-                                    </form>
+                                    {{#isLeader}}
+                                        <form action="/study/member/remove" method="post" style="display:inline;">
+                                            <input type="hidden" name="memberId" value="{{user.userId}}">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fa-solid fa-trash" aria-hidden="true"></i> 내보내기
+                                            </button>
+                                        </form>
+                                    {{/isLeader}}
+                                    {{^isLeader}}
+                                        <form action="/chat" method="get" style="display:inline;">
+                                            <input type="hidden" name="recipientId" value="{{user.userId}}">
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fa-solid fa-comments" aria-hidden="true"></i> 채팅 보내기
+                                            </button>
+                                        </form>
+                                    {{/isLeader}}
                                 </td>
                             </tr>
                         {{/studyMemberList}}

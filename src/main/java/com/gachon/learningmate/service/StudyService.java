@@ -251,6 +251,18 @@ public class StudyService {
         }
     }
 
+    // 스터디 멤버 삭제
+    @Transactional
+    public void removeStudyMember(int studyId, String memberId) {
+        Study study = studyRepository.findByStudyId(studyId);
+        User member = userRepository.findByUserId(memberId);
+
+        StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, member)
+                .orElseThrow(() -> new IllegalArgumentException("해당 멤버를 찾을 수 없습니다."));
+
+        studyMemberRepository.delete(studyMember);
+    }
+
     // DB값 DTO로 가져오기
     public StudyDto buildStudyDto(Study study) {
         StudyDto studyDto = new StudyDto();

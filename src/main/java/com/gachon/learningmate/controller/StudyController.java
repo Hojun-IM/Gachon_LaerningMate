@@ -301,12 +301,33 @@ public class StudyController extends BaseController {
     public String showStudyMember(@RequestParam int studyId, Model model) {
         addUserInfoToModel(model);
 
+        UserPrincipalDetails currentUser = userService.getAuthentication();
+        Study study = studyService.findByStudyId(studyId);
+        boolean isLeader = study.getCreatorId().getUserId().equals(currentUser.getUser().getUserId());
+
         List<StudyMember> studyMemberList = studyService.findStudyMemberByStudyId(studyId);
         studyMemberList.forEach(member -> {
             member.setFormattedJoinDate(new SimpleDateFormat("yyyy-MM-dd").format(member.getJoinDate()));
         });
         model.addAttribute("studyMemberList", studyMemberList);
+        model.addAttribute("isLeader", isLeader);
 
         return "studyMemberList";
+    }
+
+    // 스터디 멤버 삭제
+    @PostMapping("/member/remove")
+    public String removeStudyMember(@RequestParam String memberId, @RequestParam int studyId, Model model) {
+        addUserInfoToModel(model);
+        UserPrincipalDetails currentUser = userService.getAuthentication();
+
+        Study study = studyService.findByStudyId(studyId);
+        if (!study.getCreatorId().getUserId().equals(currentUser.getUsername())) {
+            model.addAttribute("error_remove", "권한이 없습니다.");
+            return "redirect:/study/member?studyId=" + studyId;
+        }
+
+        studyService.removeStudyMember(studyId, memberId);
+        return "redirect:/study/member?studyId=" + studyId;
     }
 }
