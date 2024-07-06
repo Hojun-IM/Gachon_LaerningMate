@@ -25,8 +25,12 @@ public class UserDetailsService implements org.springframework.security.core.use
         System.out.println("userId = " + userId);
         System.out.println("user = " + user);
 
+        if (userId.isEmpty()) {
+            throw new IllegalArgumentException("아이디를 입력해주세요.");
+        }
+
         if (user == null) {
-            throw new UsernameNotFoundException(userId + "를 찾을 수 없습니다.");
+            throw new UsernameNotFoundException(userId + "을(를) 찾을 수 없습니다.");
         }
 
         return new UserPrincipalDetails(user);
