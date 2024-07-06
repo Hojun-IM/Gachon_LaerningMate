@@ -39,7 +39,7 @@ public class RegisterService {
     // 회원가입
     @Transactional
     public void register(RegisterDto registerDto) {
-        validateUserId(registerDto.getUserId());
+        validateRegisterInfo(registerDto);
 
         // 패스워드 암호화
         String encryptedPassword = passwordEncoder.encode(registerDto.getPassword());
@@ -55,7 +55,6 @@ public class RegisterService {
     public void sendVerificationCode(String email) {
         // 이메일 유효성 검사
         validateEmail(email);
-        validateEmailFormat(email);
 
         // 인증 코드 생성
         String verificationCode = createVerificationCode();
@@ -106,14 +105,10 @@ public class RegisterService {
     }
 
     // 이메일 유효성 확인
-    public void validateEmail(String email) {
+    private void validateEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new DuplicateEmailException("중복된 이메일 주소입니다.");
         }
-    }
-
-    // 이메일 유효성 확인
-    public void validateEmailFormat(String email) {
         if (!email.matches("[\\w.-]+@gachon\\.ac\\.kr")) {
             throw new IllegalArgumentException("가천대학교 이메일을 사용해주세요.");
         }
@@ -124,6 +119,12 @@ public class RegisterService {
         if (userRepository.existsByUserId(userId)) {
             throw new DuplicateUserIdException("이미 사용 중인 아이디입니다.");
         }
+    }
+
+    // 회원가입 정보 유효성 확인
+    private void validateRegisterInfo(RegisterDto registerDto) {
+        validateUserId(registerDto.getUserId());
+        validateEmail(registerDto.getEmail());
     }
 
     // 이메일 인증 여부 확인
