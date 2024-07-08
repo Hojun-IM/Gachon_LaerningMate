@@ -22,8 +22,6 @@ public class UserDetailsService implements org.springframework.security.core.use
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         // 입력 받은 ID로 회원 검색
         User user = userRepository.findByUserId(userId);
-        System.out.println("userId = " + userId);
-        System.out.println("user = " + user);
 
         if (user == null) {
             throw new UsernameNotFoundException(userId + "를 찾을 수 없습니다.");

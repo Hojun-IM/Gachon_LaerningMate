@@ -26,8 +26,8 @@ public class UserAuthenticatonProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         // 사용자 입력 로그인 정보
-        String userId = (String) authentication.getName();
-        String password = (String) authentication.getCredentials();
+        String userId = authentication.getName();
+        String password = authentication.getCredentials().toString();
 
         // 사용자 정보 가져오기
         UserPrincipalDetails userPrincipalDetails = (UserPrincipalDetails) userDetailsService.loadUserByUsername(userId);

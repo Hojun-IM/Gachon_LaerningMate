@@ -13,13 +13,13 @@ import java.nio.charset.StandardCharsets;
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+                                        AuthenticationException exception) throws IOException {
         // 오류 메시지 인코딩
-        String errorMessage = exception.getMessage();
-        String encodedMessage = URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
+        String errorMessage = URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
 
         // 예외 메시지를 쿼리 매개변수로 추가
-        response.sendRedirect("/login?error=true&message=" + encodedMessage);
+        response.sendRedirect("/login?error=true&message=" + errorMessage);
     }
 
 }
