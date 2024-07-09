@@ -42,12 +42,6 @@ public class StudyDto {
 
     private String photoPath;
 
-    // 현재 멤버 수가 최대 멤버 수 초과 불가
-    @AssertTrue(message = "현재 멤버 수는 최대 멤버 수를 초과할 수 없습니다.")
-    public boolean isCurrentMemberValid() {
-        return currentMember <= maxMember;
-    }
-
     public Study toEntity() {
         Study study = new Study();
         study.setStudyId(studyId);
