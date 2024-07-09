@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @Service
 public class StudyService {
 
-    private final FavoriteRepository favoriteRepository;
     // 사진 업로드 경로
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -37,6 +36,7 @@ public class StudyService {
     private final StudyJoinRepository studyJoinRepository;
     private final StudyMemberRepository studyMemberRepository;
     private final UserRepository userRepository;
+    private final FavoriteRepository favoriteRepository;
     private final UserService userService;
 
     @Autowired
