@@ -4,7 +4,6 @@ import com.gachon.learningmate.data.entity.Study;
 import com.gachon.learningmate.data.entity.StudyJoin;
 import com.gachon.learningmate.data.entity.StudyJoinRole;
 import com.gachon.learningmate.data.entity.User;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
