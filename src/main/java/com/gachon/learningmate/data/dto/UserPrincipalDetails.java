@@ -26,7 +26,7 @@ public class UserPrincipalDetails implements UserDetails {
     }
 
     // 사용자 이메일 반환
-    public String getUserEamil() {
+    public String getUserEmail() {
         return user.getEmail();
     }
 

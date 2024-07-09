@@ -45,7 +45,7 @@ public class StudyController extends BaseController {
         addUserInfoToModel(model);
         UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
-        model.addAttribute("email", userPrincipalDetails.getUserEamil());
+        model.addAttribute("email", userPrincipalDetails.getUserEmail());
         return "createStudy";
     }
 
@@ -58,7 +58,7 @@ public class StudyController extends BaseController {
         } catch (IOException | IllegalArgumentException e) {
             UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
             model.addAttribute("username", userPrincipalDetails.getUserRealName());
-            model.addAttribute("email", userPrincipalDetails.getUserEamil());
+            model.addAttribute("email", userPrincipalDetails.getUserEmail());
             model.addAttribute("error", e.getMessage());
             Map<String, String> validatorResult = studyService.validateHandling(result);
             validatorResult.forEach(model::addAttribute);
@@ -207,7 +207,7 @@ public class StudyController extends BaseController {
 
         model.addAttribute("studyId", studyId);
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
-        model.addAttribute("email", userPrincipalDetails.getUserEamil());
+        model.addAttribute("email", userPrincipalDetails.getUserEmail());
 
         return "applyStudy";
     }
@@ -219,7 +219,7 @@ public class StudyController extends BaseController {
 
         UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
         model.addAttribute("username", userPrincipalDetails.getUserRealName());
-        model.addAttribute("email", userPrincipalDetails.getUserEamil());
+        model.addAttribute("email", userPrincipalDetails.getUserEmail());
         model.addAttribute("studyId", studyId);
 
         try {
