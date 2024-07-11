@@ -1,6 +1,5 @@
 package com.gachon.learningmate.service;
 
-import com.gachon.learningmate.config.FileUploadUtil;
 import com.gachon.learningmate.data.dto.StudyDto;
 import com.gachon.learningmate.data.dto.StudyJoinDto;
 import com.gachon.learningmate.data.dto.UserPrincipalDetails;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,8 +27,8 @@ import java.util.stream.Collectors;
 public class StudyService {
 
     // 사진 업로드 경로
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketUrl;
 
     private final StudyRepository studyRepository;
     private final StudyJoinRepository studyJoinRepository;
@@ -38,17 +36,20 @@ public class StudyService {
     private final UserRepository userRepository;
     private final FavoriteRepository favoriteRepository;
     private final UserService userService;
+    private final S3Service s3Service;
 
     @Autowired
     public StudyService(StudyRepository studyRepository, StudyJoinRepository studyJoinRepository,
                         StudyMemberRepository studyMemberRepository, UserRepository userRepository,
-                        FavoriteRepository favoriteRepository, UserService userService) {
+                        FavoriteRepository favoriteRepository, UserService userService,
+                        S3Service s3Service) {
         this.studyRepository = studyRepository;
         this.studyJoinRepository = studyJoinRepository;
         this.studyMemberRepository = studyMemberRepository;
         this.userRepository = userRepository;
         this.favoriteRepository = favoriteRepository;
         this.userService = userService;
+        this.s3Service = s3Service;
     }
 
     // 전체 스터디 조회
@@ -85,11 +86,13 @@ public class StudyService {
     public void createStudy(StudyDto studyDto, MultipartFile photo) throws IOException {
         UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
         studyDto.setCreatorId(userPrincipalDetails.getUser());
-        validatePhoto(photo, studyDto);
 
         // 기본 사진 경로 설정
-        if (studyDto.getPhotoPath() == null || studyDto.getPhotoPath().isEmpty()) {
-            studyDto.setPhotoPath("/img/default-study.jpg");
+        if (photo != null && !photo.isEmpty()) {
+            String fileUrl = s3Service.saveFile(photo);
+            studyDto.setPhotoPath(fileUrl);
+        } else {
+            studyDto.setPhotoPath("https://learning-mate.s3.amazonaws.com/study/img/default-study.jpg");
         }
 
         Study study = studyDto.toEntity();
@@ -111,8 +114,14 @@ public class StudyService {
         UserPrincipalDetails principalDetails = userService.getAuthentication();
         validateStudyAndUser(existingStudy, principalDetails);
 
+        // 이미지 경로 확인
         if (photo != null && !photo.isEmpty()) {
-            validatePhoto(photo, studyDto);
+            // 기본 이미지가 아닌 경우 삭제
+            if (existingStudy.getPhotoPath() != null && existingStudy.getPhotoPath().equals(bucketUrl + "/default-study.jpg")) {
+                s3Service.deleteFile(existingStudy.getPhotoPath());
+            }
+            String fileUrl = s3Service.saveFile(photo);
+            studyDto.setPhotoPath(fileUrl);
         } else {
             studyDto.setPhotoPath(existingStudy.getPhotoPath());
         }
@@ -233,20 +242,6 @@ public class StudyService {
             validatorResult.put(errorKey, error.getDefaultMessage());
         }
         return validatorResult;
-    }
-
-    // 사진 유효성 검사 및 저장
-    @Transactional
-    public void validatePhoto(MultipartFile photo, StudyDto studyDto) throws IOException {
-        if (photo != null && !photo.isEmpty()) {
-            if (!FileUploadUtil.isExtensionValid(photo)) {
-                throw new IOException("허용되는 파일 형식은 jpg, jpeg, png입니다.");
-            }
-
-            String fileName = StringUtils.cleanPath(photo.getOriginalFilename());
-            FileUploadUtil.saveFile(uploadDir, fileName, photo);
-            studyDto.setPhotoPath("/img/study-logo/" + fileName);
-        }
     }
 
     // 스터디 멤버 삭제

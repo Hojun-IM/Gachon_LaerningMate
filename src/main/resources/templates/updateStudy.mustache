@@ -11,7 +11,7 @@
                         <input type="hidden" name="photoPath" value="{{#studyDto}}{{studyDto.photoPath}}{{/studyDto}}">
 
                         <div class="form-group">
-                            <img id="imagePreview" src="{{#studyDto}}{{studyDto.photoPath}}{{/studyDto}}" class="img-fluid mb-3" alt="Image Preview" style="width: 100%; height: 260px; object-fit: cover;">
+                            <img id="imagePreview" src="{{#studyDto.photoPath}}{{studyDto.photoPath}}{{/studyDto.photoPath}}" class="img-fluid mb-3" alt="Image Preview" style="width: 100%; height: 260px; object-fit: cover;">
                             <input type="file" class="form-control" id="file-upload" name="photo" onchange="previewFile()"/>
                             <div class="text-danger mb-2" style="min-height: 8px;">{{#error_photoPath}}{{error_photoPath}}{{/error_photoPath}}</div>
                         </div>
@@ -32,6 +32,7 @@
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <label for="studyName" class="form-label">스터디명</label>
                                 <input type="text" class="form-control" name="studyName" value="{{#studyDto}}{{studyDto.studyName}}{{/studyDto}}"/>
+                                <div class="text-danger" style="min-height: 8px;">{{#error_studyName}}{{error_studyName}}{{/error_studyName}}</div>
                             </div>
 
                             <div class="row">
@@ -39,6 +40,7 @@
                                     <div data-mdb-input-init class="form-outline datepicker">
                                         <label for="maxMember" class="form-label">최대 인원</label>
                                         <input type="text" class="form-control" name="maxMember" value="{{#studyDto}}{{studyDto.maxMember}}{{/studyDto}}"/>
+                                        <div class="text-danger" style="min-height: 8px;">{{#error_maxMember}}{{error_maxMember}}{{/error_maxMember}}</div>
                                     </div>
                                 </div>
 
@@ -46,6 +48,7 @@
                                     <div data-mdb-input-init class="form-outline datepicker">
                                         <label for="category" class="form-label">카테고리</label>
                                         <input type="text" class="form-control" name="category" value="{{#studyDto}}{{studyDto.category}}{{/studyDto}}"/>
+                                        <div class="text-danger" style="min-height: 8px;">{{#error_category}}{{error_category}}{{/error_category}}</div>
                                     </div>
                                 </div>
                             </div>
@@ -53,11 +56,13 @@
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <label for="location" class="form-label">활동 장소</label>
                                 <input type="text" class="form-control" name="location" value="{{#studyDto}}{{studyDto.location}}{{/studyDto}}"/>
+                                <div class="text-danger" style="min-height: 8px;">{{#error_location}}{{error_location}}{{/error_location}}</div>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <label for="description" class="form-label">스터디 소개</label>
                                 <textarea class="form-control" name="description">{{#studyDto}}{{studyDto.description}}{{/studyDto}}</textarea>
+                                <div class="text-danger" style="min-height: 8px;">{{#error_description}}{{error_description}}{{/error_description}}</div>
                             </div>
                             <button type="submit" class="btn btn-danger btn-lg mb-1">수정 완료</button>
                         </div>
@@ -80,7 +85,7 @@
         if (file) {
             reader.readAsDataURL(file);
         } else {
-            preview.src = "/images/default-study.jpg";
+            preview.src = "https://learning-mate.s3.amazonaws.com/study/img/default-study.jpg"; // 기본 이미지로 재설정
         }
     }
 </script>

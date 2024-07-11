@@ -51,7 +51,8 @@ public class StudyController extends BaseController {
 
     // 스터디 생성
     @PostMapping("/create")
-    public String createStudy(@RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
+    public String createStudy(@RequestParam(value = "photo", required = false) MultipartFile photo,
+                              @Valid StudyDto studyDto, BindingResult result, Model model) {
         addUserInfoToModel(model);
         try {
             studyService.createStudy(studyDto, photo);
@@ -64,7 +65,6 @@ public class StudyController extends BaseController {
             validatorResult.forEach(model::addAttribute);
             return "createStudy";
         }
-
         return "redirect:/study";
     }
 
@@ -169,7 +169,8 @@ public class StudyController extends BaseController {
 
     // 스터디 수정
     @PostMapping("/update")
-    public String updateStudy(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, @Valid StudyDto studyDto, BindingResult result, Model model) {
+    public String updateStudy(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo,
+                              @Valid StudyDto studyDto, BindingResult result, Model model) {
         addUserInfoToModel(model);
         try {
             studyDto.setStudyId(studyId);
@@ -180,13 +181,13 @@ public class StudyController extends BaseController {
             validatorResult.forEach(model::addAttribute);
             return "updateStudy";
         }
-
         return "redirect:/study/info?studyId=" + studyDto.getStudyId();
     }
 
     // 스터디 신청 폼
     @GetMapping("/apply")
-    public String showApplyStudyForm(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo, StudyDto studyDto, Model model) {
+    public String showApplyStudyForm(@RequestParam int studyId, @RequestParam(value = "photo", required = false) MultipartFile photo,
+                                     StudyDto studyDto, Model model) {
         addUserInfoToModel(model);
         UserPrincipalDetails userPrincipalDetails = userService.getAuthentication();
         studyDto.setCreatorId(userPrincipalDetails.getUser());
@@ -195,14 +196,6 @@ public class StudyController extends BaseController {
         if (photo == null || photo.isEmpty()) {
             Study existingStudy = studyService.findByStudyId(studyId);
             studyDto.setPhotoPath(existingStudy.getPhotoPath());
-        } else {
-            try {
-                studyService.validatePhoto(photo, studyDto);
-            } catch (IOException e) {
-                model.addAttribute("error_photoPath", e.getMessage());
-                model.addAttribute("studyDto", studyDto);
-                return "updateStudy";
-            }
         }
 
         model.addAttribute("studyId", studyId);
